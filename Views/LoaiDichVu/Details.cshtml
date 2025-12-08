@@ -1,0 +1,181 @@
+﻿@model Shipping.Models.LoaiDichVu
+
+@{
+    ViewData["Title"] = "Details";
+    var configs = (IEnumerable<Config>)ViewBag.Config;
+    Config? hangnang = configs.FirstOrDefault(s => s.Id == "HEAVY_THRESHOLD");
+    Config? gioihan = configs.FirstOrDefault(s => s.Id == "WEIGHT_LIMIT");
+}
+
+<h1 class="text-center">Thông tin dịch vụ giao hàng</h1>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <dl class="row">
+            <dt class="col-md-4">
+                Tên dịch vụ:
+            </dt>
+            <dd class="col-md-8">
+                @Model.TenDichVu
+            </dd>
+            <dt class="col-md-4">
+                Thời gian giao:
+            </dt>
+            <dd class="col-md-8">
+                Từ @Model.ThoiGianToiThieu - @Model.ThoiGianToiDa ngày
+            </dd>
+            <dt class="col-md-4">
+                Mốc cân nặng:
+            </dt>
+            <dd class="col-md-8">
+                @(Model.MocCanNang)kg
+            </dd>
+        </dl>
+    </div>
+    <div class="col-md-6">
+        <dl class="row">
+            <dt class="col-md-4">
+                Mã dịch vụ:
+            </dt>
+            <dd class="col-md-8">
+                @Model.MaDV
+            </dd>
+            <dt class="col-md-4">
+                Mô tả:
+            </dt>
+            <dd class="col-md-8">
+                @Model.MoTa
+            </dd>
+            <dt class="col-md-4">
+                Đơn vị tăng thêm:
+            </dt>
+            <dd class="col-md-8">
+                @(Model.DonViTangThem)kg
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group mb-3 text-center">
+            <a class="btn btn-outline-warning" asp-action="Edit" asp-route-id="@Model.Id">Cập nhật</a> &nbsp;
+            <a asp-action="Index" class="btn btn-outline-secondary">Trở về danh sách</a>
+        </div>
+    </div>
+</div>
+
+
+<h3 class="text-center">Bảng giá giao hàng</h3>
+<table class="table table-bordered">
+    <thead class="table-dark justify-content-center">
+        <tr class="text-center">
+            <th class="col-md-3">
+                Trọng lượng
+            </th>
+            <th class="col-md-3">
+                Nội tỉnh
+            </th>
+            <th class="col-md-3">
+                Nội miền
+            </th>
+            <th class="col-md-3">
+                Liên miền
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.CauTrucGiaCuocs.All(g => g.GiaTangThem == 0))
+        {
+            decimal w0 = 0;
+            decimal index = 0;
+            @while (w0 < Model.MocCanNang)
+            {
+                decimal w = w0 + Model.DonViTangThem;
+                <tr class="text-center">
+                    @if (w0 == 0)
+                    {
+                        <td class="text-start">Đến dưới @((w * 1000).ToString("N0")) gram</td>
+                    }
+                    else
+                    {
+                        <td class="text-start">Từ @((w0 * 1000).ToString("N0")) đến dưới @((w * 1000).ToString("N0")) gram</td>
+                    }
+                    @foreach (var item in Model.CauTrucGiaCuocs)
+                    {
+                        @if (w0 == 0)
+                        {
+                            <td>@(item.GiaCoBan.ToString("N0"))</td>
+                        }
+                        else
+                        {
+                            <td>@((item.GiaCoBan + index * item.GiaTangThem).ToString("N0"))</td>
+                        }
+                    }
+                </tr>
+                w0 += Model.DonViTangThem;
+                index++;
+            }
+            <tr class="text-center">
+                <td class="text-start">
+                    Mỗi @(Model.DonViTangThem.ToString("N1"))kg tiếp theo
+                </td>
+                @foreach (var item in Model.CauTrucGiaCuocs)
+                {
+                    <td>@(item.GiaVuot.ToString("N0"))</td>
+                }
+            </tr>
+        }
+        else
+        {
+            <tr class="text-center">
+                <td class="text-start">
+                    Đến @Model.MocCanNang.ToString("N0")kg
+                </td>
+                @foreach (var item in Model.CauTrucGiaCuocs)
+                {
+                    <td>@(item.GiaCoBan.ToString("N0"))</td>
+                }
+            </tr>
+            <tr class="text-center">
+                <td class="text-start">
+                    Mỗi @Model.DonViTangThem.ToString("N1")kg tiếp theo
+                </td>
+                @foreach (var item in Model.CauTrucGiaCuocs)
+                {
+                    <td>@(item.GiaVuot.ToString("N0"))</td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h3 class="text-center">Bảng thời gian dự kiến</h3>
+<table class="table table-bordered">
+    <thead class="table-dark justify-content-center">
+        <tr class="text-center">
+            <th class="col-md-3">
+
+            </th>
+            <th class="col-md-3">
+                Nội tỉnh
+            </th>
+            <th class="col-md-3">
+                Nội miền
+            </th>
+            <th class="col-md-3">
+                Liên miền
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="text-center">
+            <td class="text-start">Thời gian giao dự kiến</td>
+            @foreach (var item in Model.CauTrucGiaCuocs)
+            {
+                <td>@(item.ThoiGianGiao.ToString("N0")) ngày</td>
+            }
+        </tr>
+    </tbody>
+</table>
+

@@ -1,0 +1,191 @@
+﻿@page
+@model RegisterModel
+
+@{
+    ViewData["Title"] = "Đăng ký tài khoản";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using Shipping.Models.Enums
+
+<div class="row justify-content-center pt-4 pb-5">
+    <div class="col-lg-9">
+        <div class="card shadow-lg border-0 rounded-lg mt-5">
+            <div class="card-header bg-success text-white text-center py-3">
+                <h3 class="fw-light my-0"><i class="fas fa-user-plus me-2"></i> Đăng ký Khách hàng</h3>
+            </div>
+
+            <div class="card-body p-5">
+                <form id="registerForm" method="post" asp-route-returnUrl="@Model.ReturnUrl">
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-4"></div>
+
+                    <div class="bg-light p-3 rounded mb-4 border">
+                        <label class="fw-bold text-dark mb-2 d-block">Bạn là đối tượng nào?</label>
+
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" asp-for="Input.LoaiKhachHang"
+                                   value="@LoaiKhachHang.CaNhan" id="typeCaNhan">
+                            <label class="form-check-label" for="typeCaNhan">Cá nhân</label>
+                        </div>
+
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" asp-for="Input.LoaiKhachHang"
+                                   value="@LoaiKhachHang.DoanhNghiep" id="typeDoanhNghiep">
+                            <label class="form-check-label" for="typeDoanhNghiep">Doanh nghiệp / Tổ chức</label>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold text-success mb-3">Thông tin Tài khoản</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.Email" class="form-control" autocomplete="username" placeholder="Email" />
+                                <label asp-for="Input.Email">Email (*)</label>
+                                <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.Ten" class="form-control" placeholder="Họ tên" />
+                                <label asp-for="Input.Ten">Họ tên / Tên Công ty (*)</label>
+                                <span asp-validation-for="Input.Ten" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" placeholder="Mật khẩu" />
+                                <label asp-for="Input.Password">Mật khẩu (*)</label>
+                                <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" placeholder="Xác nhận mật khẩu" />
+                                <label asp-for="Input.ConfirmPassword">Xác nhận mật khẩu (*)</label>
+                                <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <h5 class="fw-bold text-success mb-3">Thông tin Chi tiết</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.SDT" class="form-control" placeholder="Số điện thoại" />
+                                <label asp-for="Input.SDT">Số điện thoại (*)</label>
+                                <span asp-validation-for="Input.SDT" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.CCCD" class="form-control" placeholder="CCCD" />
+                                <label asp-for="Input.CCCD">CCCD (Nếu là cá nhân)</label>
+                                <span asp-validation-for="Input.CCCD" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.MaSoThue" class="form-control" placeholder="Mã số thuế" />
+                                <label asp-for="Input.MaSoThue">Mã số thuế (Bắt buộc với Doanh nghiệp)</label>
+                                <span asp-validation-for="Input.MaSoThue" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <select asp-for="Input.TinhThanhId" class="form-select" asp-items="@(ViewData["TinhThanhList"] as SelectList)">
+                                    <option value="">-- Chọn Tỉnh/Thành phố --</option>
+                                </select>
+                                <label asp-for="Input.TinhThanhId">Tỉnh/Thành phố (*)</label>
+                                <span asp-validation-for="Input.TinhThanhId" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <select asp-for="Input.PhuongXaId" class="form-select">
+                                    <option value="@Model.Input.PhuongXaId" selected>
+                                        @(Model.Input.PhuongXaId != null ? "Đang tải..." : "-- Chọn Tỉnh trước --")
+                                    </option>
+                                </select>
+                                <label asp-for="Input.PhuongXaId">Phường/Xã (*)</label>
+                                <span asp-validation-for="Input.PhuongXaId" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.DiaChi" class="form-control" placeholder="Địa chỉ chi tiết" />
+                        <label asp-for="Input.DiaChi">Địa chỉ chi tiết (Số nhà, đường...)</label>
+                        <span asp-validation-for="Input.DiaChi" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button id="registerSubmit" type="submit" class="btn btn-success btn-lg fw-bold">HOÀN TẤT ĐĂNG KÝ</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center py-3 bg-light border-0">
+                <div class="small">Đã có tài khoản? <a asp-page="./Login" class="fw-bold text-success">Đăng nhập!</a></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        var phuongXaSelect = $('#Input_PhuongXaId');
+        var initialPhuongXaId = '@Model.Input.PhuongXaId';
+
+        // Hàm load Phường/Xã bằng AJAX
+        function loadPhuongXa(tinhSelectId, phuongSelectId, selectedPhuongId = null) {
+                var tinhId = $(tinhSelectId).val();
+                var $phuongSelect = $(phuongSelectId);
+
+                if (tinhId) {
+                    $phuongSelect.empty().append('<option value="">Đang tải...</option>');
+                    var url = '@Url.Action("GetPhuongXaByTinhThanh", "Adress")';
+
+                    $.ajax({
+                        url: url,
+                        type: 'GET',
+                        data: { tinhThanhId: tinhId },
+                        success: function(data) {
+                            $phuongSelect.empty().append('<option value="">-- Chọn Phường/Xã --</option>');
+                            $.each(data, function(index, item) {
+                                var option = $('<option>', { value: item.id, text: item.name });
+                                if(selectedPhuongId && item.id === selectedPhuongId) {
+                                    option.attr('selected', 'selected');
+                                }
+                                $phuongSelect.append(option);
+                            });
+                        },
+                        error: function() { $phuongSelect.empty().append('<option value="">Lỗi tải dữ liệu</option>'); }
+                    });
+                } else {
+                    $phuongSelect.empty().append('<option value="">-- Chọn Tỉnh trước --</option>');
+                }
+            }
+
+        $('#Input_TinhThanhId').change(function () {
+            console.log('Change!');
+            loadPhuongXa('#Input_TinhThanhId', '#Input_PhuongXaId');
+        });
+
+        var initialTinhThanhId = $('#Input_TinhThanhId').val();
+        if (initialTinhThanhId) {
+            loadPhuongXa('#Input_TinhThanhId', '#Input_PhuongXaId', '@Model.Input.PhuongXaId');
+        }
+    </script>
+}

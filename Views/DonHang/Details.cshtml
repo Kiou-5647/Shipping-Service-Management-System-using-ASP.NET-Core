@@ -1,0 +1,722 @@
+﻿@using Shipping.Models
+@using Shipping.Models.Enums
+@using Shipping.ViewModels
+@model Shipping.Models.DonHang
+
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
+
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng " + Model.Id;
+
+    // --- LOGIC TIMELINE ---
+    bool daHuy = Model.TrangThaiDH == TrangThaiDonHang.ThatBai;
+    bool daGiao = Model.TrangThaiDH == TrangThaiDonHang.DaGiao;
+
+    var step1 = !daHuy ? "active" : "cancelled";
+    var step2 = (Model.TrangThaiDH == TrangThaiDonHang.DangGiao || daGiao) && !daHuy ? "active" : "";
+    var step3 = daGiao ? "completed" : "";
+
+    var isAdminOrNhanVien = User.IsInRole("Admin") || User.IsInRole("NhanVien");
+}
+
+<style>
+    /* CSS Timeline */
+    .timeline-wrapper {
+        padding: 20px 0;
+    }
+
+    .timeline-steps {
+        display: flex;
+        justify-content: center;
+        position: relative;
+    }
+
+        .timeline-steps::before {
+            content: "";
+            position: absolute;
+            top: 20px;
+            left: 15%;
+            right: 15%;
+            height: 2px;
+            background: #e9ecef;
+            z-index: 0;
+        }
+
+    .timeline-step {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        width: 33.33%;
+    }
+
+    .inner-circle {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 10px;
+        color: #6c757d;
+        font-size: 1.2rem;
+        border: 3px solid #fff;
+        box-shadow: 0 0 0 2px #e9ecef;
+    }
+
+    .timeline-step.active .inner-circle {
+        background: #0d6efd;
+        color: #fff;
+        box-shadow: 0 0 0 3px #b6d4fe;
+    }
+
+    .timeline-step.completed .inner-circle {
+        background: #198754;
+        color: #fff;
+        box-shadow: 0 0 0 3px #c3e6cb;
+    }
+
+    .timeline-step.cancelled .inner-circle {
+        background: #dc3545;
+        color: #fff;
+        box-shadow: 0 0 0 3px #f8d7da;
+    }
+
+    /* CSS In ấn */
+    @@media print {
+        .d-print-none, .btn, .breadcrumb, header, footer {
+            display: none !important;
+        }
+
+        .card {
+            border: 1px solid #000 !important;
+            box-shadow: none !important;
+        }
+
+        .bg-light {
+            background-color: #fff !important;
+        }
+
+        body {
+            font-size: 12pt;
+            background-color: #fff;
+        }
+
+        .col-lg-8, .col-lg-4 {
+            width: 100% !important;
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        a[href]:after {
+            content: none !important;
+        }
+
+        #cardShipment {
+            display: none;
+        }
+    }
+</style>
+
+<div class="container-fluid px-4 pb-5">
+
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-4 d-print-none">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    @if (isAdminOrNhanVien)
+                    {
+                        <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Trang chủ</a></li>
+                        <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none">Đơn hàng</a></li>
+                        <li class="breadcrumb-item active">@Model.Id</li>
+                    }
+                    else
+                    {
+                        <li class="breadcrumb-item"><a asp-action="MyOrders" class="text-decoration-none">Đơn hàng của tôi</a></li>
+                        <li class="breadcrumb-item active">@Model.Id</li>
+                    }
+                </ol>
+            </nav>
+            <h1 class="h3 mb-0 text-gray-800">Chi tiết Vận đơn <span class="text-primary">#@Model.Id</span></h1>
+        </div>
+        <div class="btn-group shadow-sm">
+            @if (isAdminOrNhanVien)
+            {
+                <a asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i> Quay lại</a>
+                <button class="btn btn-outline-dark" onclick="window.print()"><i class="fas fa-print me-1"></i> In vận đơn</button>
+                @if (Model.TrangThaiDH == TrangThaiDonHang.ChoXuLy)
+                {
+                    <form asp-action="DeleteOrder" asp-route-id="@Model.Id" method="post" class="d-inline" onsubmit="return confirm('Hành động này không thể hoàn tác. Xóa đơn hàng?');">
+                        <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt me-1"></i> Xóa</button>
+                    </form>
+                }
+            }
+            else
+            {
+                <a asp-controller="DonHang" asp-action="MyOrders" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i> Quay lại</a>
+                <button class="btn btn-outline-dark" onclick="window.print()"><i class="fas fa-print me-1"></i> In vận đơn</button>
+            }
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success d-print-none">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger d-print-none">@TempData["Error"]</div>
+    }
+
+    <div class="card mb-4 shadow-sm border-0 d-print-none">
+        <div class="card-body py-4">
+            <div class="timeline-wrapper">
+                <div class="timeline-steps">
+                    <div class="timeline-step @step1">
+                        <div class="inner-circle"><i class="fas fa-file-invoice"></i></div>
+                        <div class="timeline-content">
+                            @Html.DisplayFor(m => m.TrangThaiDH) <br>
+                            <small class="text-muted fw-normal">@Model.NgayTao.ToString("dd/MM/yy HH:mm")</small>
+                        </div>
+                    </div>
+                    <div class="timeline-step @step2">
+                        <div class="inner-circle"><i class="fas fa-shipping-fast"></i></div>
+                        <div class="timeline-content">Đang giao hàng</div>
+                    </div>
+                    @if (daHuy)
+                    {
+                        <div class="timeline-step cancelled">
+                            <div class="inner-circle"><i class="fas fa-times"></i></div>
+                            <div class="timeline-content text-danger fw-bold">Đã hủy đơn</div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="timeline-step @step3">
+                            <div class="inner-circle"><i class="fas fa-check-circle"></i></div>
+                            <div class="timeline-content">Giao thành công</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-map-marked-alt me-2"></i>Thông tin Hành trình</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 border-end">
+                            <label class="small text-muted fw-bold text-uppercase mb-2"><i class="fas fa-paper-plane text-primary me-1"></i> Người gửi</label>
+                            <h5 class="fw-bold mb-1">@Model.TTNguoiGui</h5>
+                            <p class="mb-1 text-dark">@Model.DiaChiGui</p>
+                            <p class="text-muted small mb-0">@Model.PhuongXaGui?.TenPhuongXa, @Model.TinhThanhGui?.TenTinhThanh</p>
+                        </div>
+                        <div class="col-md-6 ps-md-4 mt-3 mt-md-0">
+                            <label class="small text-muted fw-bold text-uppercase mb-2"><i class="fas fa-map-marker-alt text-success me-1"></i> Người nhận</label>
+                            <h5 class="fw-bold mb-1">@Model.TTNguoiNhan</h5>
+                            <p class="mb-1 text-dark">@Model.DiaChiNhan</p>
+                            <p class="text-muted small mb-0">@Model.PhuongXaNhan?.TenPhuongXa, @Model.TinhThanhNhan?.TenTinhThanh</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-box me-2"></i>Thông tin Kiện hàng</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <table class="table table-sm table-borderless">
+                                <tr>
+                                    <td class="text-muted w-25">Dịch vụ:</td>
+                                    <td class="fw-bold text-primary">@Model.LoaiDichVu?.TenDichVu</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Trọng lượng:</td>
+                                    <td>@Model.TrongLuongThuc kg</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Kích thước:</td>
+                                    <td>@Model.ChieuDai x @Model.ChieuRong x @Model.ChieuCao cm</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Ghi chú:</td>
+                                    <td class="fst-italic text-danger">@(string.IsNullOrEmpty(Model.GhiChu) ? "Không có" : Model.GhiChu)</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-5 text-center">
+                            <label class="small text-muted d-block mb-2">Ảnh kiện hàng (Gửi):</label>
+                            @if (!string.IsNullOrEmpty(Model.HinhAnhGoiHang))
+                            {
+                                <a href="/images/donhang/@Model.Id/@Model.HinhAnhGoiHang" target="_blank">
+                                    <img src="/images/donhang/@Model.Id/@Model.HinhAnhGoiHang" class="img-thumbnail shadow-sm" style="max-height: 150px; object-fit: cover;" alt="Ảnh gói hàng" />
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="border rounded bg-light py-4 text-muted small">
+                                    <i class="fas fa-image fa-2x mb-2 d-block opacity-50"></i> Chưa có ảnh
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @if (isAdminOrNhanVien)
+            {
+            <div id="cardShipment" class="card shadow border-0 mb-4 border-top-warning border-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-truck-loading me-2"></i>Lịch sử & Điều phối</h6>
+                    @if (!daHuy && !daGiao)
+                    {
+                        <button class="btn btn-sm btn-primary shadow-sm px-3" data-bs-toggle="modal" data-bs-target="#modalAddShipment">
+                            <i class="fas fa-plus me-1"></i> Phân công
+                        </button>
+                    }
+                </div>
+                <div class="card-body p-0">
+                    @if (ViewBag.ListChuyenHang != null)
+                    {
+                        var listChuyen = (IEnumerable<ChuyenHangViewModel>)ViewBag.ListChuyenHang;
+                        if (listChuyen.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="ps-3">Shipper</th>
+                                            <th>Lộ trình & Trạng thái</th>
+                                            <th class="text-end pe-3">Tác vụ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var chuyen in listChuyen)
+                                        {
+                                            <tr>
+                                                <td class="ps-3" style="min-width: 200px;">
+                                                    <div class="fw-bold text-primary"><i class="fas fa-user-astronaut me-1"></i> @chuyen.TenShipper</div>
+                                                    <small class="text-muted">@chuyen.SDTShipper</small>
+                                                    <div class="small text-muted mt-1">@chuyen.NgayTao.ToString("dd/MM HH:mm")</div>
+                                                </td>
+                                                <td>
+                                                    <div class="small mb-1">
+                                                        <div class="text-truncate" title="@chuyen.TenPhuongGui, @chuyen.TenTinhGui">
+                                                            <i class="fas fa-circle text-secondary" style="font-size: 6px;"></i> <span class="fw-bold">Đi:</span> @chuyen.TenPhuongGui, @chuyen.TenTinhGui
+                                                        </div>
+                                                        <div class="text-truncate" title="@chuyen.TenPhuongNhan, @chuyen.TenTinhNhan">
+                                                            <i class="fas fa-circle text-success" style="font-size: 6px;"></i> <span class="fw-bold">Đến:</span> @chuyen.TenPhuongNhan, @chuyen.TenTinhNhan
+                                                        </div>
+                                                    </div>
+
+                                                    @{
+                                                        string badgeColor = chuyen.TrangThai switch
+                                                        {
+                                                            TrangThaiDonHang.DaGiao => "bg-success",
+                                                            TrangThaiDonHang.DangGiao => "bg-primary",
+                                                            TrangThaiDonHang.ThatBai => "bg-danger",
+                                                            _ => "bg-secondary"
+                                                        };
+                                                    }
+                                                    <span class="badge @badgeColor rounded-pill" style="font-size: 0.7rem;">@chuyen.TrangThai</span>
+
+                                                    @if (!string.IsNullOrEmpty(chuyen.HinhAnhGiaoHang))
+                                                    {
+                                                        <a href="/images/donhang/@chuyen.DonHangId/@chuyen.HinhAnhGiaoHang" target="_blank" class="badge bg-light text-dark border ms-2 text-decoration-none">
+                                                            <i class="fas fa-camera text-success"></i> Xem ảnh
+                                                        </a>
+                                                    }
+
+                                                    @if (!string.IsNullOrEmpty(chuyen.GhiChu))
+                                                    {
+                                                        <div class="text-muted fst-italic small mt-1"><i class="far fa-comment-alt me-1"></i>@chuyen.GhiChu</div>
+                                                    }
+                                                </td>
+                                                <td class="text-end pe-3">
+                                                    @if (chuyen.TrangThai != TrangThaiDonHang.DaGiao)
+                                                    {
+                                                        <button class="btn btn-sm btn-outline-primary me-1" title="Cập nhật" data-bs-toggle="modal" data-bs-target="#modalUpdateStatus-@chuyen.DonHangId-@chuyen.ThuTu">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <form asp-controller="ChuyenHang" asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Xóa chuyến này?');">
+                                                            <input type="hidden" name="donHangId" value="@chuyen.DonHangId" />
+                                                            <input type="hidden" name="thuTu" value="@chuyen.ThuTu" />
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa"><i class="fas fa-trash"></i></button>
+                                                        </form>
+                                                    }
+                                                </td>
+                                            </tr>
+
+                                            <div class="modal fade" id="modalUpdateStatus-@chuyen.DonHangId-@chuyen.ThuTu" tabindex="-1">
+                                                <div class="modal-dialog modal-sm">
+                                                    <form asp-controller="ChuyenHang" asp-action="UpdateStatus" method="post">
+                                                        <input type="hidden" name="donHangId" value="@chuyen.DonHangId" />
+                                                        <input type="hidden" name="thuTu" value="@chuyen.ThuTu" />
+                                                        <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                                                        <div class="modal-content">
+                                                            <div class="modal-header bg-info text-white py-2">
+                                                                <h6 class="modal-title small">Cập nhật trạng thái</h6>
+                                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div class="mb-2">
+                                                                    <label class="form-label small fw-bold">Trạng thái:</label>
+                                                                    <select name="trangThai" class="form-select form-select-sm" asp-items="Html.GetEnumSelectList<TrangThaiDonHang>()" asp-for="@chuyen.TrangThai"></select>
+                                                                </div>
+                                                                <div class="mb-2">
+                                                                    <label class="form-label small fw-bold">Ghi chú:</label>
+                                                                    <textarea name="ghiChu" class="form-control form-control-sm" rows="2">@chuyen.GhiChu</textarea>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer py-1">
+                                                                <button type="submit" class="btn btn-sm btn-primary w-100">Lưu</button>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-4 text-muted small">
+                                <i class="fas fa-truck-moving fa-2x mb-2 opacity-50"></i><br>Chưa có chuyến hàng nào.
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+            }
+        </div>
+
+        <div class="col-lg-4">
+
+            <div class="card shadow border-0 mb-4 border-top-primary border-4">
+                <div class="card-header bg-white py-3">
+                    <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-receipt me-2"></i>Chi tiết Tài chính</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Phí vận chuyển:</span>
+                        <span class="fw-bold">@Model.PhiGiaoHang.ToString("N0") ₫</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Phụ phí:</span>
+                        <span class="fw-bold">@((Model.TongPhiPhuTro).ToString("N0")) ₫</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2 p-2 bg-light rounded">
+                        <span class="fw-bold text-dark">Thu hộ (COD):</span>
+                        <span class="fw-bold text-primary">@((Model.COD).ToString("N0")) ₫</span>
+                    </div>
+                    <hr>
+                    <div class="text-end">
+                        <small class="text-muted text-uppercase">Tổng thu người nhận</small>
+                        <h3 class="text-danger fw-bold">@Model.ThanhTien.ToString("N0") ₫</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow border-0 mb-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-money-bill-wave me-2"></i>Thanh toán</h6>
+                    @if (Model.TrangThaiTT == TrangThaiThanhToan.DaThanhToan)
+                    {
+                        <span class="badge bg-success"><i class="fas fa-check me-1"></i>Đã thanh toán</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i>Chờ thanh toán</span>
+                    }
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Hình thức:</strong> <span class="text-primary fw-bold">@Html.DisplayFor(m => m.PTThanhToan)</span>
+                    </div>
+                    @if (Model.TrangThaiTT == TrangThaiThanhToan.DaThanhToan)
+                    {
+                        <div class="text-center">
+                            @if (!string.IsNullOrEmpty(Model.HinhAnhXacNhan))
+                            {
+                                <a href="/images/donhang/@Model.Id/@Model.HinhAnhXacNhan" target="_blank">
+                                    <img src="/images/donhang/@Model.Id/@Model.HinhAnhXacNhan" class="img-fluid rounded border" alt="Bằng chứng TT" />
+                                </a>
+                            }
+                            else
+                            {
+                                <p class="text-muted small fst-italic border p-2 rounded">Đã xác nhận (Không có ảnh)</p>
+                            }
+                        </div>
+                    }
+                    else if (isAdminOrNhanVien && !daHuy && Model.TrangThaiTT != TrangThaiThanhToan.DaThanhToan)
+                    {
+                        <form asp-action="ConfirmPayment" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Tải lên bằng chứng (UNC/Tiền mặt):</label>
+                                <input type="file" name="evidenceFile" id="paymentFile" class="form-control form-control-sm" accept="image/*" />
+                                <div id="paymentPreviewBox" class="d-none mt-2 text-center border p-1 bg-light">
+                                    <img id="paymentPreviewImg" src="#" style="max-height: 100px;" />
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100 fw-bold" onclick="return confirm('Xác nhận đã thu đủ tiền?')">
+                                <i class="fas fa-check-circle me-1"></i> XÁC NHẬN THU TIỀN
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+
+            @if (!daHuy && !daGiao)
+            {
+                <div class="d-print-none">
+                    <button class="btn btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#modalCancel"><i class="fas fa-ban me-1"></i> Hủy đơn hàng này</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalCancel" tabindex="-1">
+    <div class="modal-dialog">
+        <form asp-action="CancelOrder" method="post">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Xác nhận hủy đơn</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Lý do hủy:</label>
+                        <textarea name="lyDo" class="form-control" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="submit" class="btn btn-danger">Xác nhận Hủy</button></div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (isAdminOrNhanVien)
+{
+    <div class="modal fade" id="modalAddShipment" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form asp-action="AddShipment" method="post">
+                <input type="hidden" name="DonHangId" value="@Model.Id" />
+                <input type="hidden" id="originTinhId" value="@Model.TinhGuiId" />
+
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title"><i class="fas fa-shipping-fast me-2"></i>Phân công Chuyến Hàng</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row g-3">
+
+                            <div class="col-md-6 border-end">
+                                <h6 class="text-primary fw-bold">Điểm Đi (Nguồn)</h6>
+
+                                <select name="LoaiDiemDi" id="srcType" class="form-select form-select-sm mb-2" onchange="toggleLoc('src')">
+                                    <option value="1">Địa chỉ Người Gửi (Đơn gốc)</option>
+                                    <option value="3">Chi nhánh / Kho</option>
+                                    <option value="4" selected>Tiếp nối chuyến trước (Mặc định)</option>
+                                    <option value="5">Khác (Nhập tay)</option>
+                                </select>
+
+                                <div id="srcBranch" class="d-none">
+                                    <select name="ChiNhanhDiId" id="srcBranchSelect" class="form-select form-select-sm"
+                                            asp-items="@ViewBag.ChiNhanhs"
+                                            onchange="loadShippers()">
+                                        <option value="">-- Chọn Kho --</option>
+                                    </select>
+                                </div>
+
+                                <div id="srcManual" class="d-none mt-2">
+                                    <input name="DiaChiGui" class="form-control form-control-sm mb-1" placeholder="Số nhà, đường..." />
+
+                                    <select name="TinhGuiId" id="srcManualTinhId" class="form-select form-select-sm"
+                                            asp-items="@(new SelectList(ViewBag.TinhThanh, "Id", "TenTinhThanh"))"
+                                            onchange="loadShippers()">
+                                        <option value="">-- Chọn Tỉnh/Thành --</option>
+                                    </select>
+
+                                    <input name="PhuongGuiId" type="hidden" value="00001" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <h6 class="text-success fw-bold">Điểm Đến (Đích)</h6>
+
+                                <select name="LoaiDiemDen" id="dstType" class="form-select form-select-sm mb-2" onchange="toggleLoc('dst')">
+                                    <option value="2" selected>Giao cho Người Nhận (Đơn gốc)</option>
+                                    <option value="3">Chi nhánh / Kho</option>
+                                    <option value="5">Khác (Nhập tay)</option>
+                                </select>
+
+                                <div id="dstBranch" class="d-none">
+                                    <select name="ChiNhanhDenId" class="form-select form-select-sm" asp-items="@ViewBag.ChiNhanhs">
+                                        <option value="">-- Chọn Kho --</option>
+                                    </select>
+                                </div>
+
+                                <div id="dstManual" class="d-none mt-2">
+                                    <input name="DiaChiNhan" class="form-control form-control-sm mb-1" placeholder="Số nhà, đường..." />
+                                    <select name="TinhNhanId" class="form-select form-select-sm" asp-items="@(new SelectList(ViewBag.TinhThanh, "Id", "TenTinhThanh"))">
+                                        <option value="">Tỉnh/Thành...</option>
+                                    </select>
+                                    <input name="PhuongNhanId" type="hidden" value="00001" />
+                                </div>
+                            </div>
+
+                            <div class="col-12 mt-3 p-3 bg-light border rounded">
+                                <label class="fw-bold text-success"><i class="fas fa-user-check me-1"></i> Chọn Shipper:</label>
+
+                                <select name="ShipperId" id="ajaxShipperSelect" class="form-select" required>
+                                    <option value="">-- Đang tải dữ liệu... --</option>
+                                </select>
+
+                                <div class="form-text text-muted small">
+                                    <i class="fas fa-info-circle"></i> Hệ thống tự động lọc Shipper đang <b>Sẵn sàng</b> tại khu vực <b>Điểm Đi</b>.
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Ghi chú chuyến hàng:</label>
+                                <textarea name="GhiChu" class="form-control" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Tạo Chuyến</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        function toggleShipperList() {
+            var isDelivery = document.getElementById("typeDelivery").checked;
+            var selDel = document.getElementById("selDelivery");
+            var selTrans = document.getElementById("selTransport");
+            if (isDelivery) {
+                selDel.classList.remove("d-none"); selDel.disabled = false;
+                selTrans.classList.add("d-none"); selTrans.disabled = true;
+            } else {
+                selDel.classList.add("d-none"); selDel.disabled = true;
+                selTrans.classList.remove("d-none"); selTrans.disabled = false;
+            }
+        }
+        function toggleLoc(side) {
+            var type = $('#srcType').val(); // Mặc định lấy src
+            if(side === 'dst') type = $('#dstType').val();
+
+            var branchBox = $('#' + side + 'Branch');
+            var manualBox = $('#' + side + 'Manual');
+
+            branchBox.addClass('d-none');
+            manualBox.addClass('d-none');
+
+            if (type === '3') branchBox.removeClass('d-none');
+            else if (type === '5') manualBox.removeClass('d-none');
+            // Nếu thay đổi bên Nguồn (src) thì trigger load lại shipper
+            if (side === 'src') {
+                loadShippers();
+            }
+        }
+
+        function loadShippers() {
+            var srcType = $('#srcType').val();
+            var locationId = "";
+            var $select = $('#ajaxShipperSelect');
+
+            // Helper gọi API
+            function fetchShippers(locId) {
+                $select.html('<option>Đang tìm kiếm...</option>');
+                if (locId) {
+                    $.getJSON('/Shipper/GetAvailableShippers', { locationId: locId }, function (data) {
+                        $select.empty();
+                        if (data.length > 0) {
+                            $select.append('<option value="">-- Chọn Shipper (Đề xuất) --</option>');
+                            $.each(data, function (i, item) {
+                                $select.append(`<option value="${item.id}">${item.ten}</option>`);
+                            });
+                        } else {
+                            $select.append('<option value="">(Không có Shipper Sẵn sàng tại đây)</option>');
+                        }
+                    });
+                } else {
+                    $select.html('<option value="">-- Chưa xác định được vị trí --</option>');
+                }
+            }
+
+            // Logic xác định ID Tỉnh
+            if (srcType === "1") {
+                // Đơn gốc -> Lấy ID tỉnh gốc
+                fetchShippers($('#originTinhId').val());
+            }
+            else if (srcType === "5") {
+                // Nhập tay -> Lấy từ dropdown Tỉnh nhập tay
+                fetchShippers($('#srcManualTinhId').val());
+            }
+            else if (srcType === "3") {
+                // Chi nhánh -> Gọi API giải mã Tỉnh của chi nhánh
+                var cnId = $('#srcBranchSelect').val();
+                if(cnId) {
+                    $.getJSON('/Shipper/ResolveLocation', { type: 3, dataId: cnId }, function(res) {
+                        fetchShippers(res.locationId);
+                    });
+                } else {
+                    $select.html('<option value="">-- Vui lòng chọn Kho --</option>');
+                }
+            }
+            else if (srcType === "4") {
+                // Tiếp nối -> Gọi API giải mã điểm đến chuyến trước
+                var orderId = '@Model.Id';
+                $.getJSON('/Shipper/ResolveLocation', { type: 4, orderId: orderId }, function(res) {
+                    fetchShippers(res.locationId);
+                });
+            }
+        }
+
+
+
+        $(document).ready(function() {
+            $('#modalAddShipment').on('show.bs.modal', function () {
+                toggleLoc('src');
+                toggleLoc('dst');
+                loadShippers();
+            });
+
+            // Logic xem ảnh preview thanh toán (Code cũ của bạn)
+            $("#paymentFile").change(function(e) {
+                var file = e.target.files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        $("#paymentPreviewImg").attr("src", e.target.result).removeClass('d-none');
+                        $("#paymentPreviewBox").removeClass('d-none');
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+
+    </script>
+}

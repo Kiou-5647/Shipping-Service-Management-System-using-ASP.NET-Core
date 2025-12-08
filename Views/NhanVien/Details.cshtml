@@ -1,0 +1,122 @@
+﻿@model Shipping.Models.NhanVien
+
+@{
+	ViewData["Title"] = "Quản lý nhân viên";
+}
+<h1 class="text-center">Thông tin nhân viên</h1>
+<hr />
+
+<div class="row">
+	<div class="col col-md-3">
+		<div class="form-group mb-3">
+			<img src="/images/avatar/nhanvien/@Model.HinhAnh" id="HinhAnh" style="max-width: 100%; height: auto; border: 1px solid #ccc; display:block"
+				 onerror="this.onerror = 'null'; this.src='/images/avatar/default_image.jpg'"
+				 asp-append-version="true" />
+		</div>
+	</div>
+	<div class="col col-md-9">
+		<div class="row">
+			<div class="col-md-6">
+				<dl class="row mb-0">
+					<dt class="col-md-4">
+						Họ tên:
+					</dt>
+					<dd class="col-md-8">
+						@Html.DisplayFor(model => model.Ten)
+					</dd>
+					<dt class="col-md-4">
+						Email:
+					</dt>
+					<dd class="col-md-8">
+						@Html.DisplayFor(model => model.User.Email)
+					</dd>
+					<dt class="col-md-4">
+						Số điện thoại:
+					</dt>
+					<dd class="col-md-8">
+						@Html.DisplayFor(model => model.User.PhoneNumber)
+					</dd>
+					<dt class="col-md-4">
+						CCCD:
+					</dt>
+					<dd class="col-md-8">
+						@Html.DisplayFor(model => model.CCCD)
+					</dd>
+					<dt class="col-md-4">
+						Tỉnh/Thành:
+					</dt>
+					<dd class="col-md-8">
+						@{
+							var dsTinhThanh = (IEnumerable<TinhThanh>)ViewBag.TinhThanh;
+							var t = dsTinhThanh.FirstOrDefault(t => t.Id == Model.TinhThanhId);
+							string tenTinhThanh = t != null ? t.TenTinhThanh : "Không tìm thấy tỉnh/thành phố";
+						}
+						@tenTinhThanh
+					</dd>
+				</dl>
+			</div>
+			<div class="col-md-6">
+				<dl class="row mb-0">
+					<dt class="col-md-4">
+						Ngày sinh:
+					</dt>
+					<dd class="col-md-8">
+						@Html.DisplayFor(model => model.NgaySinh)
+					</dd>
+					<dt class="col-md-4">
+						Giới tính:
+					</dt>
+					<dd class="col-md-8">
+						@(Model.GioiTinh ? "Nam" : "Nữ")
+					</dd>
+					<dt class="col-md-4">
+						Chi nhánh:
+					</dt>
+					<dd class="col-md-8">
+						@{
+							var dsChiNhanh = (IEnumerable<ChiNhanh>)ViewBag.ChiNhanh;
+							var c = dsChiNhanh.FirstOrDefault(c => c.Id == Model.ChiNhanhId);
+							string tenChiNhanh = c != null ? c.TenChiNhanh : "Không thuộc chi nhánh nào";
+						}
+						@tenChiNhanh
+					</dd>
+					<dt class="col-md-4">
+						Chức vụ:
+					</dt>
+					<dd class="col-md-8">
+						@(Model.IsQuanLy ? "Quản lý" : "Nhân viên")
+					</dd>
+					<dt class="col-md-4">
+						Phường/Xã:
+					</dt>
+					<dd class="col-md-8">
+						@{
+							var dsPhuongXa = (IEnumerable<PhuongXa>)ViewBag.PhuongXa;
+							var p = dsPhuongXa.FirstOrDefault(t => t.Id == Model.PhuongXaId);
+							string tenPhuongXa = p != null ? p.TenPhuongXa : "Không tìm thấy phường/xã";
+						}
+						@tenPhuongXa
+					</dd>
+				</dl>
+			</div>
+			<div class="col-md-12">
+				<dl class="row">
+					<dt class="col-md-2">
+						Địa chỉ hiện tại:
+					</dt>
+					<dd class="col-md-10">
+						@Html.DisplayFor(m => Model.DiaChi), @tenPhuongXa, @tenTinhThanh
+					</dd>
+				</dl>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="form-group mb-3 text-center">
+			<a class="btn btn-outline-warning" asp-action="Edit" asp-route-id="@Model.Id">Cập nhật</a> &nbsp;
+			<a asp-action="Index" class="btn btn-outline-secondary">Trở về danh sách</a>
+		</div>
+	</div>
+</div>

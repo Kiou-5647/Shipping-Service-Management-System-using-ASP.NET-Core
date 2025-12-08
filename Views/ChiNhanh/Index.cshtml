@@ -1,0 +1,59 @@
+﻿@model IEnumerable<Shipping.Models.ChiNhanh>
+
+@{
+    ViewData["Title"] = "Quản lý chi nhánh";
+    int index = 1;
+}
+
+<h1>Danh sách chi nhánh</h1>
+
+<p>
+    <a class="btn btn-primary" asp-action="Create">Thêm chi nhánh</a>
+</p>
+<hr />
+<table class="table table-bordered">
+    <thead class="table-dark justify-content-center">
+        <tr class="text-center">
+            <th>
+                #
+            </th>
+            <th>
+                Tên chi nhánh
+            </th>
+            <th>
+                Số điện thoại
+            </th>
+            <th>
+                Địa chỉ chi nhánh
+            </th>
+            <th>
+                Tác vụ
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="align-middle">
+                <td>
+                    <b>@(index++)</b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TenChiNhanh)
+                </td>
+                <td class="text-center">
+                    @Html.DisplayFor(modelItem => item.SDT)
+                </td>
+                <td>
+                    @item.DiaChi, @item.PhuongXa.TenPhuongXa, @item.TinhThanh.TenTinhThanh
+                </td>
+                <td class="text-center">
+                    <a class="btn btn-outline-warning" asp-action="Edit" asp-route-id="@item.Id">Cập nhật</a> &nbsp;
+                    <a class="btn btn-outline-success" asp-action="Details" asp-route-id="@item.Id">Chi tiết</a> &nbsp;
+                    <a class="btn btn-outline-danger" asp-action="Delete" asp-route-id="@item.Id"
+                       onclick="return confirm('Bạn có chắc chắn muốn xóa chi nhánh này không?');">Xóa</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

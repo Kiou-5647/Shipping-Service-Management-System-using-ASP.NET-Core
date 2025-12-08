@@ -1,0 +1,239 @@
+﻿@using Shipping.Models.Enums
+@model Shipping.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard Quản trị";
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4 mb-4">Tổng quan Hệ thống</h1>
+
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-primary border-4 shadow-sm h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Đơn hôm nay</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.DonHangMoiHomNay</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar fa-2x text-gray-300 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-success border-4 shadow-sm h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Doanh thu (Ngày)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.DoanhThuHomNay.ToString("N0") ₫</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-warning border-4 shadow-sm h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Chờ xử lý</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.DonHangChoXuLy</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-info border-4 shadow-sm h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Shipper đang chạy</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.ShipperDangBan</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-motorcycle fa-2x text-gray-300 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-white">
+                    <h6 class="m-0 font-weight-bold text-primary">Biểu đồ 7 ngày qua</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="myAreaChart" style="height: 320px; width: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-white">
+                    <h6 class="m-0 font-weight-bold text-primary">Tỷ lệ Trạng thái</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie pt-4 pb-2">
+                        <canvas id="myPieChart" style="height: 250px; width: 100%;"></canvas>
+                    </div>
+                    <div class="mt-4 text-center small">
+                        <span class="mr-2"><i class="fas fa-circle text-success"></i> Đã giao</span>
+                        <span class="mr-2"><i class="fas fa-circle text-primary"></i> Đang giao</span>
+                        <span class="mr-2"><i class="fas fa-circle text-danger"></i> Hủy/Lỗi</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header py-3 bg-white">
+            <h6 class="m-0 font-weight-bold text-primary">Đơn hàng mới nhận</h6>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-3">Mã đơn</th>
+                            <th>Khách hàng</th>
+                            <th>Dịch vụ</th>
+                            <th>Ngày tạo</th>
+                            <th>Tổng tiền</th>
+                            <th>Trạng thái</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.DonHangMoiNhat)
+                        {
+                            <tr>
+                                <td class="ps-3 fw-bold text-primary">#@item.Id</td>
+                                <td>
+                                    <div>@item.TTNguoiGui?.Split('-')[0]</div>
+                                    <small class="text-muted">Gui tu: @item.DiaChiGui</small>
+                                </td>
+                                <td><span class="badge bg-light text-dark border">@item.LoaiDichVu?.TenDichVu</span></td>
+                                <td>@item.NgayTao.ToString("dd/MM HH:mm")</td>
+                                <td class="fw-bold">@item.ThanhTien.ToString("N0") ₫</td>
+                                <td>
+                                    @{
+                                        string badge = item.TrangThaiDH switch
+                                        {
+                                            TrangThaiDonHang.ChoXuLy => "bg-warning text-dark",
+                                            TrangThaiDonHang.DangGiao => "bg-primary",
+                                            TrangThaiDonHang.DaGiao => "bg-success",
+                                            _ => "bg-secondary"
+                                        };
+                                    }
+                                    <span class="badge @badge">@item.TrangThaiDH</span>
+                                </td>
+                                <td class="text-end pe-3">
+                                    <a asp-controller="DonHang" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white text-center">
+            <a asp-controller="DonHang" asp-action="Index" class="text-decoration-none small fw-bold">Xem tất cả đơn hàng <i class="fas fa-angle-right"></i></a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // --- 1. Area Chart (Line) ---
+        var ctxArea = document.getElementById("myAreaChart");
+        var myLineChart = new Chart(ctxArea, {
+            type: 'line',
+            data: {
+                // Lấy dữ liệu từ ViewModel và chuyển thành JSON Array
+                labels: @Html.Raw(Json.Serialize(Model.LabelsNgay)),
+                datasets: [{
+                    label: "Số đơn hàng",
+                    lineTension: 0.3,
+                    backgroundColor: "rgba(78, 115, 223, 0.05)",
+                    borderColor: "rgba(78, 115, 223, 1)",
+                    pointRadius: 3,
+                    pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointBorderColor: "rgba(78, 115, 223, 1)",
+                    pointHoverRadius: 3,
+                    pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+                    pointHitRadius: 10,
+                    pointBorderWidth: 2,
+                    data: @Html.Raw(Json.Serialize(Model.DataDonHang)), // Data số đơn
+                }],
+            },
+            options: {
+                maintainAspectRatio: false,
+                layout: { padding: { left: 10, right: 25, top: 25, bottom: 0 } },
+                scales: {
+                    x: { grid: { display: false, drawBorder: false }, ticks: { maxTicksLimit: 7 } },
+                    y: { ticks: { maxTicksLimit: 5, padding: 10 }, grid: { color: "rgb(234, 236, 244)", zeroLineColor: "rgb(234, 236, 244)", drawBorder: false } },
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // --- 2. Pie Chart ---
+        var ctxPie = document.getElementById("myPieChart");
+        var myPieChart = new Chart(ctxPie, {
+            type: 'doughnut',
+            data: {
+                labels: ["Đã Giao", "Đang Giao", "Hủy/Lỗi"],
+                datasets: [{
+                    data: [@Model.CountDaGiao, @Model.CountDangGiao, @Model.CountHuy],
+                    backgroundColor: ['#198754', '#0d6efd', '#dc3545'], // Xanh lá, Xanh dương, Đỏ
+                    hoverBackgroundColor: ['#157347', '#0b5ed7', '#bb2d3b'],
+                    hoverBorderColor: "rgba(234, 236, 244, 1)",
+                }],
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: "rgb(255,255,255)",
+                        bodyColor: "#858796",
+                        borderColor: '#dddfeb',
+                        borderWidth: 1,
+                        xPadding: 15,
+                        yPadding: 15,
+                        displayColors: false,
+                        caretPadding: 10,
+                    }
+                },
+                cutout: '70%', // Độ rỗng giữa
+            },
+        });
+    </script>
+}

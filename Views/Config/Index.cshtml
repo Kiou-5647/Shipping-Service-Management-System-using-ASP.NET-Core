@@ -1,0 +1,98 @@
+﻿@using Shipping.Models.Enums
+@model Shipping.ViewModels.ConfigListViewModel
+
+@{
+    ViewData["Title"] = "Quản lý Cấu hình Hệ thống";
+}
+
+<h1 class="text-center">@ViewData["Title"]</h1>
+<br/>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<form asp-action="Index" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <table class="table table-bordered table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Tên cấu hình</th>
+                <th>Giá trị</th>
+                <th>Mô tả</th>
+                <th>Áp dụng</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Configs.Count; i++)
+            {
+                var config = Model.Configs[i];
+                <tr>
+                    <td>
+                        <input type="hidden" asp-for="Configs[i].Id" />
+                        <input type="hidden" asp-for="Configs[i].Ten" />
+                        <input type="hidden" asp-for="Configs[i].Loai" />
+                        <input type="hidden" asp-for="Configs[i].LoaiGiaTri" />
+                        <input type="hidden" asp-for="Configs[i].MoTa" />
+
+                        <strong>@config.Ten</strong>
+                        <br />
+                        <small class="text-muted">(@config.Id)</small>
+                    </td>
+                    <td>
+                        <div class="input-group">
+                            <input asp-for="Configs[i].GiaTri" value="@config.GiaTri.ToString("N")" class="form-control" />
+                            @if(config.LoaiGiaTri != LoaiGiaTri.None)
+                            {
+                                <span class="input-group-text">
+                                    @if (config.LoaiGiaTri == LoaiGiaTri.Percent)
+                                    {
+                                        <span>%</span>
+                                    }
+                                    else if (config.LoaiGiaTri == LoaiGiaTri.Fixed)
+                                    {
+                                        <span>VND</span>
+                                    }
+                                </span>
+                            }
+                        </div>
+                        <span asp-validation-for="Configs[i].GiaTri" class="text-danger"></span>
+                    </td>
+                    <td>
+                        <p class="mb-0 text-wrap"><small>@config.MoTa</small></p>
+                    </td>
+                    <td class="align-middle">
+                        @if (config.Loai == LoaiConfig.LuaChon)
+                        {
+                            <span class="badge bg-primary">Lựa chọn</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Tự động</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="row mt-4">
+        <div class="col-12 text-end">
+            <button type="submit" class="btn btn-primary btn-lg">
+                <i class="bi bi-save"></i> Lưu Cấu hình
+            </button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        // Đảm bảo Validation Scripts được render
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

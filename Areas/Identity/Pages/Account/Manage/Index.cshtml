@@ -1,0 +1,242 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Hồ sơ cá nhân";
+    ViewData["ActivePage"] = ManageNavPages.Index;
+
+    // Kiểm tra Role để render giao diện
+    bool isKhachHang = User.IsInRole("KhachHang");
+    bool isShipper = User.IsInRole("Shipper");
+    bool isNhanVien = User.IsInRole("NhanVien") || User.IsInRole("Admin");
+    var avatarUrl = "";
+}
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
+
+
+<h3>@ViewData["Title"]</h3>
+<partial name="_StatusMessage" for="StatusMessage" />
+
+<div class="row">
+    <div class="col-md-9">
+        <form id="profile-form" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <input type="hidden" asp-for="Input.Id" />
+            <input type="hidden" asp-for="Input.Email" />
+            <input type="hidden" asp-for="Input.AvatarPath" />
+
+            <div class="row">
+                @if (!isKhachHang)
+                {
+                    <div class="col-md-4 text-center mb-4">
+                        <div class="mb-3">
+                            @if(User.IsInRole("Nhanvien") || User.IsInRole("Admin") ){
+                                avatarUrl = !string.IsNullOrEmpty(Model.Input.AvatarPath)
+                                ? $"/images/avatar/nhanvien/{Model.Input.AvatarPath}" : "/images/avatar/default_image.jpg";
+                            }
+                            else
+                            {
+                                avatarUrl = !string.IsNullOrEmpty(Model.Input.AvatarPath)
+                                ? $"/images/avatar/shipper/{Model.Input.AvatarPath}" : "/images/avatar/default_image.jpg";
+                            }
+                            <img src="@avatarUrl" id="avatarPreview" class="rounded-circle shadow-sm border"
+                                 style="width: 150px; height: 150px; object-fit: cover;" alt="Avatar" />
+                        </div>
+                        <label class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-camera me-1"></i> Đổi ảnh
+                            <input asp-for="Input.AvatarFile" type="file" class="d-none" accept="image/*" onchange="previewImage(this)" />
+                        </label>
+                    </div>
+                }
+
+                <div class="@(isKhachHang ? "col-md-12" : "col-md-8")">
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Username" class="form-control"/>
+                        <label asp-for="Username">Tên đăng nhập / Email</label>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-floating">
+                                <input asp-for="Input.Ten" class="form-control" placeholder="Họ tên" />
+                                <label asp-for="Input.Ten"></label>
+                                <span asp-validation-for="Input.Ten" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-floating">
+                                <input asp-for="Input.PhoneNumber" class="form-control" placeholder="SDT" />
+                                <label asp-for="Input.PhoneNumber"></label>
+                                <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-floating">
+                                <input asp-for="Input.CCCD" class="form-control" placeholder="CCCD" />
+                                <label asp-for="Input.CCCD"></label>
+                                <span asp-validation-for="Input.CCCD" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        @if (isKhachHang)
+                        {
+                            <div class="col-md-6 mb-3">
+                                <div class="form-floating">
+                                    <input asp-for="Input.MaSoThue" class="form-control" placeholder="MST" />
+                                    <label asp-for="Input.MaSoThue"></label>
+                                </div>
+                            </div>
+                        }
+
+                        @if (isShipper || isNhanVien)
+                        {
+                            <div class="col-md-6 mb-3">
+                                <div class="form-floating">
+                                    <input asp-for="Input.NgaySinh" class="form-control" />
+                                    <label asp-for="Input.NgaySinh"></label>
+                                </div>
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <label class="fw-bold small mb-1">Giới tính:</label><br />
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" asp-for="Input.GioiTinh" value="true" id="genderMale">
+                                    <label class="form-check-label" for="genderMale">Nam</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" asp-for="Input.GioiTinh" value="false" id="genderFemale">
+                                    <label class="form-check-label" for="genderFemale">Nữ</label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    @if (isShipper)
+                    {
+                        <div class="card bg-light border-0 mb-3">
+                            <div class="card-body">
+                                <h6 class="text-primary fw-bold mb-3"><i class="fas fa-motorcycle me-2"></i>Thông tin hoạt động</h6>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-floating">
+                                            <input asp-for="Input.BienSo" class="form-control" placeholder="Biển số" />
+                                            <label asp-for="Input.BienSo"></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-floating">
+                                            <select asp-for="Input.LoaiShipper" class="form-select"
+                                                    asp-items="Html.GetEnumSelectList<Shipping.Models.Enums.LoaiShipper>()">
+                                            </select>
+                                            <label asp-for="Input.LoaiShipper"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <h6 class="fw-bold mt-2"><i class="fas fa-map-marker-alt me-2 text-danger"></i>Địa chỉ liên hệ</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-floating">
+                                <select asp-for="Input.TinhThanhId" class="form-select" asp-items="@(ViewData["TinhThanhList"] as SelectList)">
+                                    <option value="">-- Tỉnh/Thành --</option>
+                                </select>
+                                <label asp-for="Input.TinhThanhId"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-floating">
+                                <select asp-for="Input.PhuongXaId" class="form-select">
+                                    <option value="@Model.Input.PhuongXaId">Đang tải...</option>
+                                </select>
+                                <label asp-for="Input.PhuongXaId"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-floating mb-4">
+                        <input asp-for="Input.DiaChi" class="form-control" placeholder="Số nhà..." />
+                        <label asp-for="Input.DiaChi"></label>
+                    </div>
+
+                    <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary fw-bold shadow-sm">
+                        <i class="fas fa-save me-2"></i> LƯU THAY ĐỔI
+                    </button>
+
+                    <div class="pb-5 mb-5"></div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            $('#Iput_TinhThanhId').change(function () {
+                loadPhuongXa('#Input_TinhThanhId', '#Input_PhuongXaId', null);
+            });
+
+            if ($('#Input_TinhThanhId').val()) {
+                loadPhuongXa('#Input_TinhThanhId', '#Input_PhuongXaId', '@Model.Input.PhuongXaId');
+            }
+        });
+
+        // Script xem trước ảnh Avatar (Giữ nguyên)
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#avatarPreview').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function loadPhuongXa(tinhSelectId, phuongSelectId, selectedPhuongId = null) {
+            var tinhId = $(tinhSelectId).val();
+            var $phuongSelect = $(phuongSelectId);
+
+            if (tinhId) {
+                $phuongSelect.empty().append('<option value="">Đang tải...</option>');
+
+                var url = '@Url.Action("GetPhuongXaByTinhThanh", "Address")';
+
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    data: { tinhThanhId: tinhId },
+                    success: function(data) {
+                        $phuongSelect.empty().append('<option value="">-- Chọn Phường/Xã --</option>');
+
+                        if (data.length === 0) {
+                            console.log("Không có dữ liệu Phường/Xã trả về.");
+                            return;
+                        }
+
+                        $.each(data, function(index, item) {
+                            var option = $('<option>', { value: item.id, text: item.name });
+
+                            if (selectedPhuongId && item.id === selectedPhuongId) {
+                                option.attr('selected', 'selected');
+                            }
+                            $phuongSelect.append(option);
+                        });
+                    },
+                    error: function() {
+                        $phuongSelect.empty().append('<option value="">Lỗi tải dữ liệu</option>');
+                    }
+                });
+            } else {
+                $phuongSelect.empty().append('<option value="">-- Chọn Tỉnh trước --</option>');
+            }
+        }
+
+    </script>
+}

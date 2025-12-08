@@ -1,0 +1,102 @@
+﻿@model Shipping.Models.ChiNhanh
+
+@{
+    ViewData["Title"] = "Quản lý chi nhánh";
+}
+<div class="row">
+    <div class="col-md-4 offset-md-4">
+        <h1 class="text-center">Cập nhật chi nhánh</h1>
+        <hr />
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="TenChiNhanh" class="control-label"></label>
+                <input asp-for="TenChiNhanh" class="form-control" />
+                <span asp-validation-for="TenChiNhanh" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SDT" class="control-label"></label>
+                <input asp-for="SDT" class="form-control" />
+                <span asp-validation-for="SDT" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TinhThanhId" class="control-label"></label>
+                <select asp-for="TinhThanhId" class="form-control" id="ddlTinhThanh" onchange="loadPhuongXa(this.value);">
+                    <option value="">-- Chọn Tỉnh/Thành phố --</option>
+                    @foreach (var t in (IEnumerable<TinhThanh>)ViewBag.TinhThanh)
+                    {
+                        <option value="@t.Id">@t.TenTinhThanh</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="PhuongXaId" class="control-label"></label>
+                <select asp-for="PhuongXaId" class="form-control" id="ddlPhuongXa">
+                    <option value="">-- Chọn Phường/Xã --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="DiaChi" class="control-label"></label>
+                <input asp-for="DiaChi" class="form-control" />
+                <span asp-validation-for="DiaChi" class="text-danger"></span>
+            </div>
+            <br />
+            <div class="form-group text-center">
+                <input type="submit" value="Lưu chi nhánh" class="btn btn-primary" /> &nbsp;
+                <a asp-action="Index" class="btn btn-outline-secondary">Trở về danh sách</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        var selectedMaPhuongXa = '@Model.PhuongXaId';
+
+        $(document).ready(function () {
+            var initialTinhThanh = $('#ddlTinhThanh').val();
+            if (initialTinhThanh) {
+                loadPhuongXa(initialTinhThanh);
+            }
+        });
+
+        function loadPhuongXa(TinhThanhId) {
+            var ddlPhuongXa = $('#ddlPhuongXa');
+
+            ddlPhuongXa.empty();
+            ddlPhuongXa.append('<option value="">-- Đang tải... --</option>');
+
+            if (!TinhThanhId) {
+                ddlPhuongXa.empty();
+                ddlPhuongXa.append('<option value="">-- Chọn Phường/Xã --</option>');
+                return;
+            }
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("GetPhuongXaByTinhThanh", "ChiNhanh")',
+                data: { TinhThanhId: TinhThanhId },
+                success: function (data) {
+                    ddlPhuongXa.empty();
+                    ddlPhuongXa.append('<option value="">-- Chọn Phường/Xã --</option>');
+                    $.each(data, function (index, item) {
+                        ddlPhuongXa.append($('<option></option>').val(item.value).text(item.text));
+                    });
+                    if (selectedMaPhuongXa) {
+                        ddlPhuongXa.val(selectedMaPhuongXa);
+                        selectedMaPhuongXa = null;
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Lỗi khi tải Phường Xã:", error);
+                    ddlPhuongXa.empty();
+                    ddlPhuongXa.append('<option value="">-- Lỗi tải dữ liệu --</option>');
+                }
+            });
+        }
+    </script>
+}

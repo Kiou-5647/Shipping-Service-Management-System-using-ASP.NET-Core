@@ -1,0 +1,407 @@
+﻿@using Shipping.Models.Enums
+@model Shipping.ViewModels.DonHangViewModel
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
+
+@{
+    ViewData["Title"] = "Tạo đơn hàng mới";
+    var isAdminOrNhanVien = User.IsInRole("Admin") || User.IsInRole("NhanVien");
+}
+
+<div class="container-fluid px-4 pb-5">
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+        <div>
+            <h1 class="h2 mb-0 text-gray-800">Tạo Đơn Hàng</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    @if (isAdminOrNhanVien)
+                    {
+                        <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Trang chủ</a></li>
+                        <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none">Đơn hàng</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Tạo mới</li>
+                    }
+                    else
+                    {
+                        <li class="breadcrumb-item"><a asp-action="MyOrders" class="text-decoration-none">Đơn hàng của tôi</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Tạo mới</li>
+                    }
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <form asp-action="Create" id="formCreateOrder" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger shadow-sm border-0 mb-4" role="alert"></div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-paper-plane me-2"></i>Thông tin Người gửi
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label asp-for="TTNguoiGui" class="form-label small text-muted fw-bold text-uppercase">Họ tên & SĐT</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fas fa-user"></i></span>
+                                    <input asp-for="TTNguoiGui" class="form-control" placeholder="Ví dụ: Nguyễn Văn A - 0988..." />
+                                </div>
+                                <span asp-validation-for="TTNguoiGui" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted fw-bold text-uppercase">Tỉnh / Thành phố</label>
+                                <select asp-for="TinhGuiId" class="form-select trigger-calc"
+                                        asp-items="@(new SelectList(ViewBag.TinhThanh, "Id", "TenTinhThanh"))">
+                                    <option value="">-- Chọn Tỉnh/Thành --</option>
+                                </select>
+                                <span asp-validation-for="TinhGuiId" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted fw-bold text-uppercase">Phường / Xã</label>
+                                <select asp-for="PhuongGuiId" class="form-select trigger-calc">
+                                    <option value="">-- Chọn Tỉnh trước --</option>
+                                </select>
+                                <span asp-validation-for="PhuongGuiId" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label asp-for="DiaChiGui" class="form-label small text-muted fw-bold text-uppercase">Địa chỉ chi tiết</label>
+                                <input asp-for="DiaChiGui" class="form-control" placeholder="Số nhà, tên đường, tòa nhà..." />
+                                <span asp-validation-for="DiaChiGui" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="m-0 font-weight-bold text-success">
+                            <i class="fas fa-map-marker-alt me-2"></i>Thông tin Người nhận
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label asp-for="TTNguoiNhan" class="form-label small text-muted fw-bold text-uppercase">Họ tên & SĐT</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fas fa-user-tag"></i></span>
+                                    <input asp-for="TTNguoiNhan" class="form-control" placeholder="Ví dụ: Trần Thị B - 0912..." />
+                                </div>
+                                <span asp-validation-for="TTNguoiNhan" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted fw-bold text-uppercase">Tỉnh / Thành phố</label>
+                                <select asp-for="TinhNhanId" class="form-select trigger-calc"
+                                        asp-items="@(new SelectList(ViewBag.TinhThanh, "Id", "TenTinhThanh"))">
+                                    <option value="">-- Chọn Tỉnh/Thành --</option>
+                                </select>
+                                <span asp-validation-for="TinhNhanId" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted fw-bold text-uppercase">Phường / Xã</label>
+                                <select asp-for="PhuongNhanId" class="form-select trigger-calc">
+                                    <option value="">-- Chọn Tỉnh trước --</option>
+                                </select>
+                                <span asp-validation-for="PhuongNhanId" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label asp-for="DiaChiNhan" class="form-label small text-muted fw-bold text-uppercase">Địa chỉ chi tiết</label>
+                                <input asp-for="DiaChiNhan" class="form-control" placeholder="Số nhà, tên đường, hẻm, ngõ..." />
+                                <span asp-validation-for="DiaChiNhan" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="m-0 font-weight-bold text-warning text-dark">
+                            <i class="fas fa-box-open me-2"></i>Chi tiết Kiện hàng
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+
+                            <div class="col-md-12">
+                                <label asp-for="HinhAnhGoiHangFile" class="form-label small text-muted fw-bold text-uppercase">Hình ảnh hàng hóa</label>
+                                <input asp-for="HinhAnhGoiHangFile" type="file" class="form-control" accept="image/*" />
+                                <div class="form-text mb-2">Chụp ảnh tình trạng hàng trước khi gửi để làm bằng chứng.</div>
+
+                                <div id="previewContainer" class="text-center d-none border rounded p-3 bg-light">
+                                    <p class="small text-muted mb-2">Ảnh xem trước:</p>
+                                    <img id="imgPreview" src="#" alt="Ảnh gói hàng" class="img-fluid rounded shadow-sm" style="max-height: 300px; object-fit: contain;" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="TrongLuongThuc" class="form-label small text-muted fw-bold text-uppercase">Trọng lượng (kg)</label>
+                                <div class="input-group">
+                                    <input asp-for="TrongLuongThuc" type="number" step="0.1" min="0" class="form-control trigger-calc fw-bold text-primary" placeholder="0.0" />
+                                    <span class="input-group-text bg-light">kg</span>
+                                </div>
+                                <span asp-validation-for="TrongLuongThuc" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-8">
+                                <label class="form-label small text-muted fw-bold text-uppercase">Kích thước (D x R x C)</label>
+                                <div class="input-group">
+                                    <input asp-for="ChieuDai" placeholder="Dài" type="number" min="0" class="form-control trigger-calc" />
+                                    <span class="input-group-text bg-light px-2">x</span>
+                                    <input asp-for="ChieuRong" placeholder="Rộng" type="number" min="0" class="form-control trigger-calc" />
+                                    <span class="input-group-text bg-light px-2">x</span>
+                                    <input asp-for="ChieuCao" placeholder="Cao" type="number" min="0" class="form-control trigger-calc" />
+                                    <span class="input-group-text bg-light">cm</span>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="GhiChu" class="form-label small text-muted fw-bold text-uppercase">Ghi chú đơn hàng</label>
+                                <textarea asp-for="GhiChu" class="form-control" rows="2" placeholder="Hàng dễ vỡ, giao giờ hành chính..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card shadow border-0 mb-4 sticky-top" style="top: 20px; z-index: 100;">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h5 class="m-0 fw-bold"><i class="fas fa-calculator me-2"></i>Tạm tính</h5>
+                    </div>
+                    <div class="card-body bg-light">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Loại dịch vụ</label>
+                            <select asp-for="LoaiDichVuId" class="form-select form-select-lg shadow-sm border-primary trigger-calc"
+                                    asp-items="@(new SelectList(ViewBag.LoaiDichVu, "Id", "TenDichVu"))">
+                            </select>
+                        </div>
+
+                        <div class="bg-white p-3 rounded shadow-sm mb-3">
+                            <div class="mb-3">
+                                <label asp-for="COD" class="form-label small fw-bold">Tiền Thu hộ (COD)</label>
+                                <div class="input-group input-group-sm">
+                                    <input asp-for="COD" type="number" step="1000" min="0" class="form-control trigger-calc text-end fw-bold" placeholder="0" />
+                                    <span class="input-group-text">VNĐ</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Thanh toán bởi</label>
+                                <select asp-for="PTThanhToan" class="form-select form-select-sm trigger-calc"
+                                        asp-items="Html.GetEnumSelectList<PhuongThucThanhToan>()">
+                                </select>
+                            </div>
+
+                            <div class="form-check form-switch">
+                                <input class="form-check-input trigger-calc" type="checkbox" asp-for="SuDungBaoHiem" id="chkBaoHiem" disabled>
+                                <label class="form-check-label small fw-bold" asp-for="SuDungBaoHiem">Bảo hiểm hàng hóa</label>
+                            </div>
+                            <div class="form-text text-muted fst-italic" style="font-size: 0.75rem;" id="msgBaoHiem">
+                            </div>
+                        </div>
+
+                        <hr class="my-3" />
+
+                        <div class="d-flex justify-content-between mb-2 small">
+                            <span class="text-muted">Phí vận chuyển:</span>
+                            <span class="fw-bold" id="lblPhiShip">0 ₫</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 small">
+                            <span class="text-muted">Phí phụ trợ:</span>
+                            <span class="fw-bold" id="lblPhuPhi">0 ₫</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 small">
+                            <span class="text-muted">Tiền thu hộ:</span>
+                            <span class="fw-bold text-primary" id="lblCOD">0 ₫</span>
+                        </div>
+
+                        <div class="alert alert-primary mt-3 mb-0 text-center">
+                            <small class="d-block text-uppercase mb-1 fw-bold">Tổng thu người nhận</small>
+                            <h2 class="fw-bold m-0 text-primary" id="lblThanhTien">0 ₫</h2>
+                        </div>
+
+                        <div class="mt-2 text-center">
+                            <small class="text-muted fst-italic" id="lblChiTiet" style="font-size: 0.75rem;">(Vui lòng nhập đầy đủ thông tin)</small>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm">
+                                <i class="fas fa-check-circle me-2"></i> TẠO ĐƠN HÀNG
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Hủy bỏ</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <input type="hidden" asp-for="PhiGiaoHang" id="hdPhiGiaoHang" />
+        <input type="hidden" asp-for="TongPhiPhuTro" id="hdTongPhiPhuTro" />
+        <input type="hidden" asp-for="ThanhTien" id="hdThanhTien" />
+        <input type="hidden" asp-for="ChiTietPhi" id="hdChiTietPhi" />
+        <input type="hidden" asp-for="KhachHangId" />
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function() {
+
+            const INSURANCE_THRESHOLD = @(ViewBag.InsuranceThreshold ?? 5000000);
+            const fmtMoney = (val) => new Intl.NumberFormat('vi-VN').format(val);
+
+            function loadPhuongXa(tinhSelectId, phuongSelectId, selectedPhuongId = null) {
+                var tinhId = $(tinhSelectId).val();
+                var $phuongSelect = $(phuongSelectId);
+
+                if (tinhId) {
+                    $phuongSelect.empty().append('<option value="">Đang tải...</option>');
+                    var url = '@Url.Action("GetPhuongXaByTinhThanh", "DonHang")';
+
+                    $.ajax({
+                        url: url,
+                        type: 'GET',
+                        data: { tinhId: tinhId },
+                        success: function(data) {
+                            $phuongSelect.empty().append('<option value="">-- Chọn Phường/Xã --</option>');
+                            $.each(data, function(index, item) {
+                                var option = $('<option>', { value: item.id, text: item.name });
+                                if(selectedPhuongId && item.id === selectedPhuongId) {
+                                    option.attr('selected', 'selected');
+                                }
+                                $phuongSelect.append(option);
+                            });
+                            calculateFee();
+                        },
+                        error: function() { $phuongSelect.empty().append('<option value="">Lỗi tải dữ liệu</option>'); }
+                    });
+                } else {
+                    $phuongSelect.empty().append('<option value="">-- Chọn Tỉnh trước --</option>');
+                }
+            }
+
+            $('#TinhGuiId').change(function() { loadPhuongXa('#TinhGuiId', '#PhuongGuiId'); });
+            $('#TinhNhanId').change(function() { loadPhuongXa('#TinhNhanId', '#PhuongNhanId'); });
+
+            // Load lần đầu (nếu Edit)
+            if($('#TinhGuiId').val()) loadPhuongXa('#TinhGuiId', '#PhuongGuiId', '@Model.PhuongGuiId');
+            if($('#TinhNhanId').val()) loadPhuongXa('#TinhNhanId', '#PhuongNhanId', '@Model.PhuongNhanId');
+
+
+            // --- 2. LOGIC CHECK BẢO HIỂM ---
+            function toggleInsuranceState() {
+                var cod = parseFloat($('#COD').val()) || 0;
+                var $chk = $('#chkBaoHiem');
+                var $msg = $('#msgBaoHiem');
+
+                if (cod >= INSURANCE_THRESHOLD) {
+                    // Đủ điều kiện: MỞ
+                    $chk.prop('disabled', false);
+                    $msg.text("").hide();
+                } else {
+                    // Không đủ: KHÓA
+                    var wasChecked = $chk.is(':checked');
+                    $chk.prop('disabled', true);
+                    $msg.text(`Chỉ áp dụng với COD >= ${fmtMoney(INSURANCE_THRESHOLD)} đ`).show();
+
+                    if (wasChecked) {
+                        $chk.prop('checked', false);
+                        calculateFee(); // Tính lại giá vì bỏ bảo hiểm
+                    }
+                }
+            }
+
+            // Gắn sự kiện riêng cho COD
+            $('#COD').on('input change', function() { toggleInsuranceState(); });
+            toggleInsuranceState(); // Check ngay khi load trang
+
+
+            var delayTimer;
+            $(document).on('input change', '.trigger-calc', function() {
+                clearTimeout(delayTimer);
+                delayTimer = setTimeout(calculateFee, 500);
+            });
+
+            function calculateFee() {
+                var data = {
+                    TinhGuiId: $('#TinhGuiId').val(),
+                    TinhNhanId: $('#TinhNhanId').val(),
+                    LoaiDichVuId: parseInt($('#LoaiDichVuId').val()) || 0,
+                    KhoiLuong: parseFloat($('#TrongLuongThuc').val()) || 0,
+                    ChieuDai: parseFloat($('#ChieuDai').val()) || 0,
+                    ChieuRong: parseFloat($('#ChieuRong').val()) || 0,
+                    ChieuCao: parseFloat($('#ChieuCao').val()) || 0,
+                    COD: parseFloat($('#COD').val()) || 0,
+                    SuDungBaoHiem: $('#SuDungBaoHiem').is(':checked'),
+                    PTThanhToan: parseInt($('#PTThanhToan').val()) || 0
+                };
+
+                // Validate sơ bộ
+                if (!data.TinhGuiId || !data.TinhNhanId || data.LoaiDichVuId === 0 || data.KhoiLuong <= 0) return;
+
+                $.ajax({
+                    url: '@Url.Action("CalculateFeeApi", "DonHang")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function(response) {
+                        const fmt = (val) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
+
+                        $('#lblPhiShip').text(fmt(response.phiGiaoHang));
+                        $('#lblPhuPhi').text(fmt(response.tongPhiPhuTro));
+                        $('#lblCOD').text(fmt(response.cod));
+                        $('#lblThanhTien').text(fmt(response.thanhTien));
+                        $('#lblChiTiet').text(response.chiTietPhi);
+
+                        // Bind ngược lại vào Hidden Input
+                        $('#hdPhiGiaoHang').val(response.phiGiaoHang);
+                        $('#hdTongPhiPhuTro').val(response.tongPhiPhuTro);
+                        $('#hdThanhTien').val(response.thanhTien);
+                        $('#hdChiTietPhi').val(response.chiTietPhi);
+                    }
+                });
+            }
+
+
+            // --- 4. PREVIEW ẢNH ---
+            $("#HinhAnhGoiHangFile").change(function(e) {
+                var file = e.target.files[0];
+                if (file) {
+                    if (!file.type.match('image.*')) {
+                        alert("Vui lòng chỉ chọn file hình ảnh!");
+                        $(this).val('');
+                        return;
+                    }
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        $("#imgPreview").attr("src", e.target.result);
+                        $("#previewContainer").removeClass("d-none");
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    $("#previewContainer").addClass("d-none");
+                    $("#imgPreview").attr("src", "#");
+                }
+            });
+
+
+            // --- 5. SUBMIT CONFIRM ---
+            $('#formCreateOrder').submit(function(e) {
+                if (!$(this).valid()) return false;
+                if (!confirm("Xác nhận tạo đơn hàng này?\nThông tin không thể sửa đổi sau khi tạo.")) e.preventDefault();
+            });
+        });
+    </script>
+}

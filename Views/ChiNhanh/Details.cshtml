@@ -1,0 +1,52 @@
+﻿@model Shipping.Models.ChiNhanh
+
+@{
+    ViewData["Title"] = "Quản lý chi nhánh";
+}
+<div class="row">
+    <div class="col-md-4 offset-md-4">
+        <div class="row">
+            <h1 class="text-center">Thông tin chi nhánh</h1>
+            <hr />
+        </div>
+        <dl class="row">
+            <dt class="col-md-4">
+                @Html.DisplayNameFor(model => model.TenChiNhanh)
+            </dt>
+            <dd class="col-md-8">
+                @Html.DisplayFor(model => model.TenChiNhanh)
+            </dd>
+            <dt class="col-md-4">
+                @Html.DisplayNameFor(model => model.SDT)
+            </dt>
+            <dd class="col-md-8">
+                @Html.DisplayFor(model => model.SDT)
+            </dd>
+            <dt class="col-md-4">
+                @Html.DisplayNameFor(model => model.TinhThanhId)
+            </dt>
+            <dd class="col-md-8">
+                @Html.DisplayFor(model => model.TinhThanh.TenTinhThanh)
+            </dd>
+            <dt class="col-md-4">
+                @Html.DisplayNameFor(model => model.PhuongXaId)
+            </dt>
+            <dd class="col-md-8">
+                @Html.DisplayFor(model => model.PhuongXa.TenPhuongXa)
+            </dd>
+            <dt class="col-md-4">
+                @Html.DisplayNameFor(model => model.DiaChi)
+            </dt>
+            <dd class="col-md-8">
+                @Html.DisplayFor(model => model.DiaChi)
+            </dd>
+        </dl>
+
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4 offset-md-4 text-center">
+        <a class="btn btn-outline-warning" asp-action="Edit" asp-route-id="@Model.Id">Cập nhật</a> &nbsp;
+        <a asp-action="Index" class="btn btn-outline-secondary">Trở về danh sách</a>
+    </div>
+</div>

@@ -1,0 +1,96 @@
+﻿@model Shipping.Models.LoaiDichVu
+
+@{
+    ViewData["Title"] = "Chỉnh Sửa Cấu Trúc Giá";
+    var giaCuocList = Model.CauTrucGiaCuocs?.ToList() ?? new List<CauTrucGiaCuoc>();
+    var minTime = Model.ThoiGianToiThieu;
+    var maxTime = Model.ThoiGianToiDa;
+}
+
+<h1 class="text-center">Cấu Hình Giá Cước Dịch Vụ: @Model.TenDichVu</h1>
+<hr />
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<p>Thông tin chung: Mốc Cân Nặng (@Model.MocCanNang kg), Đơn Vị Tăng Thêm (@Model.DonViTangThem kg).</p>
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-link">Chỉnh sửa thông tin chung</a>
+
+<div class="row">
+    @foreach (var item in giaCuocList)
+    {
+        <div class="col-md-6">
+            <form asp-action="EditGiaCuoc" method="post">
+                <input type="hidden" name="Id" value="@item.Id" />
+                <input type="hidden" name="LoaiDichVuId" value="@item.LoaiDichVuId" />
+                <input type="hidden" name="LoaiVungGia" value="@((int)item.LoaiVungGia)" />
+
+                <h4 class="mt-3">
+                    Giá cước cho vùng:
+                    @{
+                        var text = "";
+                        switch (item.LoaiVungGia)
+                        {
+                            case Shipping.Models.Enums.LoaiVungGia.NoiTinh:
+                                text = "Nội tỉnh";
+                                break;
+                            case Shipping.Models.Enums.LoaiVungGia.NoiMien:
+                                text = "Nội miền";
+                                break;
+                            case Shipping.Models.Enums.LoaiVungGia.LienMien:
+                                text = "Liên miền";
+                                break;
+                        }
+                    }
+                    @text
+                </h4>
+                <div class="row border p-3 mb-4">
+
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label>Giá Cơ Bản (VND)</label>
+                            <input name="GiaCoBan" value="@item.GiaCoBan" class="form-control" step="500" type="number" min="0" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label>Giá Tăng Thêm (VND)</label>
+                            <input name="GiaTangThem" value="@item.GiaTangThem" class="form-control" step="500" type="number" min="0" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label>Giá Vượt (VND)</label>
+                            <input name="GiaVuot" value="@item.GiaVuot" class="form-control" type="number" step="500" min="0" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label>Thời Gian Giao (Ngày)</label>
+                            <input name="ThoiGianGiao" value="@item.ThoiGianGiao" class="form-control" step="1" type="number" min="@minTime" max="@maxTime" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 text-end">
+                        <button type="submit" class="btn btn-sm btn-success">Lưu @item.LoaiVungGia.ToString()</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    }
+</div>
+
+<div class="text-center my-4">
+    <a asp-action="Index" class="btn btn-outline-secondary">Trở về danh sách dịch vụ</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

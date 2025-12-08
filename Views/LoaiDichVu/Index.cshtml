@@ -1,0 +1,51 @@
+﻿@model IEnumerable<Shipping.Models.LoaiDichVu>
+
+@{
+    ViewData["Title"] = "Quản lý dịch vụ";
+}
+
+<h1 class="text-center">Danh sách dịch vụ giao hàng</h1>
+<hr />
+<table class="table table-bordered">
+    <thead class="table-dark justify-content-center">
+        <tr class="text-center">
+            <th>
+                Mã DV
+            </th>
+            <th>
+                Tên dịch vụ
+            </th>
+            <th>
+                Mô tả
+            </th>
+            <th>
+                Thời gian giao dự kiến
+            </th>
+            <th>
+                Tác vụ
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="align-middle text-center">
+                <td>
+                    <b>@Html.DisplayFor(modelItem => item.MaDV)</b>
+                </td>
+                <td class="text-start">
+                    @Html.DisplayFor(modelItem => item.TenDichVu)
+                </td>
+                <td class="text-start">
+                    @Html.DisplayFor(modelItem => item.MoTa)
+                </td>
+                <td>
+                    @item.ThoiGianToiThieu - @item.ThoiGianToiDa ngày
+                </td>
+                <td>
+                    <a class="btn btn-outline-success" asp-action="Details" asp-route-id="@item.Id">Chi tiết</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

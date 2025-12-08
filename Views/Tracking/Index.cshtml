@@ -1,0 +1,183 @@
+﻿@using Shipping.Models.Enums
+@using Shipping.ViewModels
+@model Shipping.Models.DonHang
+
+@{
+    ViewData["Title"] = "Tra cứu vận đơn";
+    var history = ViewBag.History as IEnumerable<ChuyenHangViewModel>;
+}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-8 col-lg-6 text-center">
+            <h2 class="fw-bold mb-3 text-primary"><i class="fas fa-search-location"></i> Tra Cứu Vận Đơn</h2>
+            <p class="text-muted mb-4">Nhập mã vận đơn để theo dõi hành trình kiện hàng của bạn.</p>
+
+            <form asp-action="Index" method="get" class="card p-2 shadow-sm border-0">
+                <div class="input-group">
+                    <input type="text" name="searchId" class="form-control border-0 form-control-lg"
+                           placeholder="Ví dụ: DH123456..." value="@Context.Request.Query["searchId"]" required>
+                    <button type="submit" class="btn btn-primary px-4 fw-bold">TRA CỨU</button>
+                </div>
+            </form>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger mt-3 shadow-sm border-0">
+                    <i class="fas fa-exclamation-circle me-1"></i> @ViewBag.Error
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (Model != null)
+    {
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card shadow-lg border-0 rounded-3 overflow-hidden">
+                    <div class="card-header bg-primary text-white p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="mb-0 fw-bold">#@Model.Id</h4>
+                                <small class="opacity-75">Ngày gửi: @Model.NgayTao.ToString("dd/MM/yyyy")</small>
+                            </div>
+                            <div class="text-end">
+                                <div class="text-uppercase small opacity-75">Trạng thái</div>
+                                <h5 class="fw-bold mb-0">@Html.DisplayFor(modelItem => Model.TrangThaiDH)</h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <div class="row mb-5 text-center">
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <div class="text-muted small text-uppercase fw-bold mb-1">Người Gửi</div>
+                                <div class="fw-bold text-dark">@Model.TTNguoiGui?.Split('-')[0]</div>
+                                <div class="small text-muted">@Model.TinhThanhGui?.TenTinhThanh</div>
+                            </div>
+                            <div class="col-md-4 mb-3 mb-md-0 d-flex align-items-center justify-content-center">
+                                <div class="w-100">
+                                    <i class="fas fa-shipping-fast text-primary fa-2x mb-2"></i>
+                                    <div class="progress" style="height: 4px;">
+                                        @{
+                                            var percent = Model.TrangThaiDH == TrangThaiDonHang.DaGiao ? "100%" :
+                                            (Model.TrangThaiDH == TrangThaiDonHang.DangGiao ? "50%" : "10%");
+                                            var color = Model.TrangThaiDH == TrangThaiDonHang.ThatBai ? "bg-danger" : "bg-primary";
+                                        }
+                                        <div class="progress-bar @color" role="progressbar" style="width: @percent"></div>
+                                    </div>
+                                    <small class="text-primary fw-bold mt-1 d-block">@Model.LoaiDichVu?.TenDichVu</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-muted small text-uppercase fw-bold mb-1">Người Nhận</div>
+                                <div class="fw-bold text-dark">@Model.TTNguoiNhan?.Split('-')[0]</div>
+                                <div class="small text-muted">@Model.TinhThanhNhan?.TenTinhThanh</div>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <h5 class="fw-bold mb-4"><i class="fas fa-history text-primary me-2"></i>Chi tiết hành trình</h5>
+
+                        <div class="tracking-timeline ps-3">
+                            <div class="timeline-item pb-4">
+                                <div class="timeline-marker bg-secondary border-secondary"></div>
+                                <div class="timeline-content ps-4">
+                                    <span class="text-muted small">@Model.NgayTao.ToString("dd/MM/yyyy HH:mm")</span>
+                                    <h6 class="fw-bold mt-1">Đơn hàng được khởi tạo</h6>
+                                    <p class="text-muted small mb-0">Chờ shipper đến lấy hàng.</p>
+                                </div>
+                            </div>
+
+                            @if (history != null && history.Any())
+                            {
+                                @foreach (var item in history)
+                                {
+                                    bool isCompleted = item.TrangThai == TrangThaiDonHang.DaGiao;
+                                    string markerColor = isCompleted ? "bg-success border-success" : "bg-primary border-primary";
+
+                                    <div class="timeline-item pb-4">
+                                        <div class="timeline-marker @markerColor"></div>
+                                        <div class="timeline-content ps-4">
+                                            <span class="text-muted small">@item.NgayTao.ToString("dd/MM/yyyy HH:mm")</span>
+
+                                            <h6 class="fw-bold mt-1 text-primary">
+                                                @if (item.TrangThai == TrangThaiDonHang.DaGiao)
+                                                {
+                                                    <span>Đã hoàn thành chặng:</span>
+                                                }
+                                                else
+                                                {
+
+                                                    <span>Đang vận chuyển:</span>
+                                                }
+                                                @item.TenPhuongGui &rarr; @item.TenPhuongNhan
+                                            </h6>
+
+                                            <p class="text-muted small mb-0 fst-italic">
+                                                "@item.GhiChu"
+                                                @if (item.TenShipper != "Chưa phân công")
+                                                {
+                                                    <span>(Shipper: @item.TenShipper)</span>
+                                                }
+                                            </p>
+                                        </div>
+                                    </div>
+                                }
+                            }
+
+                            @if (Model.TrangThaiDH == TrangThaiDonHang.DaGiao)
+                            {
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-success border-success"><i class="fas fa-check text-white" style="font-size: 10px;"></i></div>
+                                    <div class="timeline-content ps-4">
+                                        <span class="text-muted small">@Model.NgayCapNhat.ToString("dd/MM/yyyy HH:mm")</span>
+                                        <h6 class="fw-bold mt-1 text-success">Giao hàng thành công</h6>
+                                        <p class="text-muted small mb-0">Cảm ơn quý khách đã sử dụng dịch vụ.</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .tracking-timeline {
+        border-left: 2px solid #e9ecef;
+        position: relative;
+        margin-left: 10px;
+    }
+
+    .timeline-item {
+        position: relative;
+    }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+    .timeline-marker {
+        position: absolute;
+        left: -8px; /* Căn chỉnh chấm tròn vào giữa đường kẻ (width marker 14px / 2 = 7px + border line 2px / 2 = 1px) */
+        top: 0;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 2px #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .timeline-marker i {
+            display: block;
+        }
+</style>

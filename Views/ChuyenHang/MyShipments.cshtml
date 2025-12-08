@@ -1,0 +1,230 @@
+﻿@using Shipping.Models.Enums
+@model IEnumerable<Shipping.ViewModels.ChuyenHangViewModel>
+
+@{
+    ViewData["Title"] = "Nhiệm vụ của tôi";
+    Layout = "_Layout";
+
+    // Tách danh sách
+    var pendingTasks = Model.Where(x => x.TrangThai != TrangThaiDonHang.DaGiao && x.TrangThai != TrangThaiDonHang.ThatBai).ToList();
+    var historyTasks = Model.Where(x => x.TrangThai == TrangThaiDonHang.DaGiao || x.TrangThai == TrangThaiDonHang.ThatBai).OrderByDescending(x => x.NgayTao).Take(20).ToList();
+}
+
+<div class="container-fluid px-0 pb-5" style="max-width: 600px; margin: 0 auto; min-height: 100vh; background-color: #f8f9fa;">
+
+    <div class="bg-primary text-white p-3 shadow-sm sticky-top d-flex justify-content-between align-items-center" style="z-index: 1020;">
+        <div>
+            <h5 class="m-0 fw-bold"><i class="fas fa-shipping-fast me-2"></i>Shipper App</h5>
+        </div>
+        <span class="badge bg-white text-primary rounded-pill fs-6">@pendingTasks.Count đơn</span>
+    </div>
+
+    <ul class="nav nav-pills nav-fill bg-white p-2 shadow-sm mb-3" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active fw-bold rounded-pill" data-bs-toggle="pill" data-bs-target="#tabPending">
+                <i class="fas fa-list-ul me-1"></i> Cần làm
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link fw-bold rounded-pill" data-bs-toggle="pill" data-bs-target="#tabHistory">
+                <i class="fas fa-history me-1"></i> Lịch sử
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content px-2 pb-5">
+        <div class="tab-pane fade show active" id="tabPending">
+            @if (pendingTasks.Any())
+            {
+                foreach (var item in pendingTasks)
+                {
+                    <div class="card border-0 shadow-sm mb-3 rounded-3 overflow-hidden">
+                        <div class="card-header bg-white border-bottom-0 pt-3 pb-0 d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="badge bg-light text-dark border me-1">#@item.DonHangId</span>
+                                <span class="badge bg-secondary text-white rounded-pill" style="font-size: 0.7rem;">Chuyến @item.ThuTu</span>
+                            </div>
+                            @if (item.TrangThai == TrangThaiDonHang.ChoXuLy)
+                            {
+                                <span class="badge bg-warning text-dark"><i class="fas fa-clock"></i> Chờ lấy</span>
+                            }
+                            else
+                            {
+
+                                <span class="badge bg-primary"><i class="fas fa-truck"></i> Đang giao</span>
+                            }
+                        </div>
+
+                        <div class="card-body">
+                            <div class="bg-light p-3 rounded border mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="text-muted small text-uppercase fw-bold">Khách nhận:</span>
+                                    <span class="fw-bold text-dark">@item.TenNguoiNhanGoc</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted small text-uppercase fw-bold">Thu hộ (COD):</span>
+                                    <span class="fw-bold text-danger fs-5">
+                                        @if (item.TongTien > 0)
+                                        {
+                                            @item.TongTien.ToString("N0")
+                                            <small>đ</small>
+         }
+                                        else
+                                        {
+                                            <span class="text-success"><i class="fas fa-check-circle"></i> Đã TT</span>
+                                        }
+                                    </span>
+                                </div>
+                                @if (!string.IsNullOrEmpty(item.GhiChuDonHang))
+                                {
+                                    <div class="mt-2 pt-2 border-top small text-muted fst-italic"><i class="fas fa-sticky-note text-warning me-1"></i> Note: @item.GhiChuDonHang</div>
+                                }
+                            </div>
+
+                            <div class="d-flex mb-3">
+                                <div class="d-flex flex-column align-items-center me-3 pt-1" style="width: 20px;">
+                                    <i class="fas fa-circle text-secondary" style="font-size: 8px;"></i>
+                                    <div class="border-start border-2 h-100 my-1" style="border-color: #dee2e6 !important;"></div>
+                                    <i class="fas fa-map-marker-alt text-danger"></i>
+                                </div>
+                                <div class="w-100">
+                                    <div class="mb-3">
+                                        <div class="text-muted small fw-bold">ĐIỂM LẤY HÀNG</div>
+                                        <div class="fw-bold text-dark text-truncate">@item.TenPhuongGui, @item.TenTinhGui</div>
+                                        <div class="text-muted small text-truncate">@item.DiaChiGui</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted small fw-bold">ĐIỂM GIAO HÀNG</div>
+                                        <div class="fw-bold text-dark text-truncate">@item.TenPhuongNhan, @item.TenTinhNhan</div>
+                                        <div class="text-muted small">@item.DiaChiNhan</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row g-2 border-top pt-3">
+                                <div class="col-3">
+                                    <a href="tel:@item.SDTNguoiNhanGoc" class="btn btn-outline-secondary w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+                                        <i class="fas fa-phone mb-1"></i> <span style="font-size: 0.7rem;">Gọi</span>
+                                    </a>
+                                </div>
+                                <div class="col-3">
+                                    <a href="https://www.google.com/maps/search/?api=1&query=@item.DiaChiNhan,+@item.TenPhuongNhan,+@item.TenTinhNhan" target="_blank" class="btn btn-outline-info w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+                                        <i class="fas fa-map-marked-alt mb-1"></i> <span style="font-size: 0.7rem;">Map</span>
+                                    </a>
+                                </div>
+                                <div class="col-6">
+                                    <button class="btn btn-success w-100 h-100 fw-bold text-white shadow-sm" data-bs-toggle="modal" data-bs-target="#modalAction-@item.DonHangId-@item.ThuTu">
+                                        <i class="fas fa-box-open me-1"></i> CẬP NHẬT
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="modalAction-@item.DonHangId-@item.ThuTu" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                            <form asp-action="UpdateStatus" method="post" enctype="multipart/form-data" class="w-100">
+                                <input type="hidden" name="donHangId" value="@item.DonHangId" />
+                                <input type="hidden" name="thuTu" value="@item.ThuTu" />
+                                <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+
+                                <div class="modal-content">
+                                    <div class="modal-header bg-success text-white">
+                                        <h5 class="modal-title fs-6">Cập nhật đơn #@item.DonHangId</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Trạng thái hiện tại:</label>
+                                            <select name="trangThai" class="form-select form-select-lg shadow-none border-success" id="statusSelect-@item.DonHangId-@item.ThuTu" onchange="toggleProofBox('@item.DonHangId-@item.ThuTu')">
+                                                <option value="@TrangThaiDonHang.DangGiao" selected="@(item.TrangThai == TrangThaiDonHang.DangGiao)">Đang giao / Đã lấy</option>
+                                                <option value="@TrangThaiDonHang.DaGiao" class="fw-bold text-success">Giao thành công</option>
+                                                <option value="@TrangThaiDonHang.ThatBai" class="text-danger">Giao thất bại</option>
+                                            </select>
+                                        </div>
+
+                                        <div id="proofBox-@item.DonHangId-@item.ThuTu" class="mb-3 d-none bg-light p-3 rounded border border-success border-2 border-dashed text-center">
+                                            <label class="form-label fw-bold text-success d-block mb-2"><i class="fas fa-camera"></i> Chụp ảnh giao hàng</label>
+                                            <input type="file" name="evidenceFile" class="form-control mb-2" capture="user" accept="image/*" onchange="previewImage(this, 'preview-@item.DonHangId-@item.ThuTu')" />
+                                            <img id="preview-@item.DonHangId-@item.ThuTu" src="#" class="img-fluid rounded d-none shadow-sm" style="max-height: 200px;" />
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Ghi chú:</label>
+                                            <textarea name="ghiChu" class="form-control" rows="2" placeholder="Ví dụ: Đã giao cho người nhà..."></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer p-2">
+                                        <button type="button" class="btn btn-secondary flex-grow-1" data-bs-dismiss="modal">Đóng</button>
+                                        <button type="submit" class="btn btn-success fw-bold flex-grow-1">XÁC NHẬN</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-center py-5 mt-5">
+                    <h5 class="text-muted">Hết việc rồi!</h5>
+                    <p class="small text-muted">Hiện tại bạn không có đơn hàng nào cần giao.</p>
+                </div>
+            }
+        </div>
+
+        <div class="tab-pane fade" id="tabHistory">
+            @if (historyTasks.Any())
+            {
+                <div class="list-group list-group-flush rounded-3 shadow-sm">
+                    @foreach (var item in historyTasks)
+                    {
+                        <div class="list-group-item list-group-item-action p-3">
+                            <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                                <h6 class="mb-0 fw-bold text-dark">#@item.DonHangId</h6>
+                                @if (item.TrangThai == TrangThaiDonHang.DaGiao)
+                                {
+                                    <span class="badge bg-success"><i class="fas fa-check"></i> Hoàn tất</span>
+                                }
+                                else
+                                {
+
+                                    <span class="badge bg-danger"><i class="fas fa-times"></i> Thất bại</span>
+                                }
+                            </div>
+                            <small class="text-muted d-block text-truncate"><i class="fas fa-map-marker-alt me-1 text-danger"></i> @item.TenPhuongNhan, @item.TenTinhNhan</small>
+                            <div class="d-flex justify-content-between mt-2">
+                                <span class="badge bg-light text-dark border">COD: @item.COD.ToString("N0")</span>
+                                <small class="text-muted fst-italic">@item.NgayTao.ToString("dd/MM HH:mm")</small>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+
+                <p class="text-center text-muted py-5">Chưa có lịch sử giao hàng.</p>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleProofBox(uniqueId) {
+            var selectBox = document.getElementById('statusSelect-' + uniqueId);
+            var proofBox = document.getElementById('proofBox-' + uniqueId);
+            var selectedText = selectBox.options[selectBox.selectedIndex].text;
+            if (selectedText.includes("thành công") || selectedText.includes("DaGiao")) proofBox.classList.remove('d-none');
+            else proofBox.classList.add('d-none');
+        }
+        function previewImage(input, previewId) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) { var img = document.getElementById(previewId); img.src = e.target.result; img.classList.remove('d-none'); }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}

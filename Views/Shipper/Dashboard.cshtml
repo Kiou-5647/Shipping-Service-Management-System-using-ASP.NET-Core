@@ -1,0 +1,136 @@
+﻿@using Shipping.Models.Enums
+@model Shipping.Models.Shipper
+
+@{
+    ViewData["Title"] = "Góc Shipper";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="fw-bold text-primary"><i class="fas fa-motorcycle me-2"></i>Xin chào, @Model.Ten</h2>
+            <p class="text-muted">Chúc bạn một ngày làm việc hiệu quả và an toàn!</p>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-lg mb-4" style="border-radius: 12px; overflow: hidden;">
+        <div class="card-header bg-primary text-white py-3 d-flex align-items-center">
+            <i class="fas fa-satellite-dish fa-lg me-2"></i>
+            <h5 class="mb-0 fw-bold text-uppercase" style="letter-spacing: 0.5px;">Cập nhật trạng thái</h5>
+        </div>
+
+        <div class="card-body p-4 bg-light">
+            <form id="frmStatus">
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-md-5">
+                        <label for="ddlViTri" class="form-label fw-bold text-secondary small text-uppercase">
+                            <i class="fas fa-map-marker-alt me-1 text-danger"></i> Bạn đang ở đâu?
+                        </label>
+                        <div class="input-group shadow-sm">
+                            <span class="input-group-text bg-white border-end-0 text-muted">
+                                <i class="fas fa-search-location"></i>
+                            </span>
+                            <select id="ddlViTri" class="form-select border-start-0 ps-0 py-2" asp-items="ViewBag.ListTinhThanh" style="cursor: pointer;">
+                                <option value="">-- Chọn Tỉnh/Thành phố --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="ddlTrangThai" class="form-label fw-bold text-secondary small text-uppercase">
+                            <i class="fas fa-signal me-1 text-success"></i> Trạng thái
+                        </label>
+                        <div class="input-group shadow-sm">
+                            <span class="input-group-text bg-white border-end-0 text-muted">
+                                <i class="fas fa-toggle-on"></i>
+                            </span>
+                            <select id="ddlTrangThai" class="form-select border-start-0 ps-0 py-2" style="cursor: pointer;">
+                                <option value="1" class="text-success fw-bold">Sẵn sàng)</option>
+                                <option value="2" class="text-warning fw-bold">Đang bận</option>
+                                <option value="3" class="text-secondary fw-bold">Nghỉ</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <button type="button" onclick="updateState()" class="btn btn-success w-100 py-2 shadow-sm fw-bold text-uppercase hover-effect">
+                            <i class="fas fa-check-circle me-2"></i> Xác nhận
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-2 d-flex align-items-center text-muted" style="font-size: 0.85rem;">
+                    <i class="fas fa-info-circle me-1"></i>
+                    <span>Hệ thống sẽ phân đơn hàng dựa trên vị trí bạn chọn.</span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card bg-white border-start border-4 border-primary shadow-sm h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Đơn cần giao</div>
+                            <a asp-controller="ChuyenHang" asp-action="MyShipments" class="h5 mb-0 font-weight-bold text-gray-800 text-decoration-none">Xem nhiệm vụ &rarr;</a>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-white border-start border-success border-4 shadow-sm h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Trạng thái hiện tại</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="txtCurrentStatus">
+                                @Html.DisplayFor(modelItem => Model.TrangThai)
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-signal fa-2x text-gray-300 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function updateState() {
+            var viTri = $('#ddlViTri').val();
+            var trangThai = $('#ddlTrangThai').val();
+            var tenTrangThai = $("#ddlTrangThai option:selected").text();
+
+            if (!viTri) {
+                alert('Vui lòng chọn vị trí hiện tại!');
+                return;
+            }
+
+            // Gọi API UpdateState
+            $.post('/Shipper/UpdateState', { viTri: viTri, trangThai: trangThai }, function (res) {
+                if (res.success) {
+                    alert('Cập nhật thành công!');
+                    // Cập nhật text hiển thị ngay lập tức mà không cần F5
+                    $('#txtCurrentStatus').text(tenTrangThai);
+                } else {
+                    alert('❌ ' + res.msg);
+                }
+            }).fail(function() {
+                alert('Lỗi kết nối đến máy chủ.');
+            });
+        }
+    </script>
+}
