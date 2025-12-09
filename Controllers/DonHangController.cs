@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +22,8 @@ using System.Threading.Tasks;
 
 namespace Shipping.Controllers
 {
-    public class DonHangController : Controller
+	[Authorize(Roles = "Admin, NhanVien, KhachHang")]
+	public class DonHangController : Controller
     {
 		private readonly IDonHangService _donHangRepo;
 		private readonly UserManager<IdentityUser> _userManager;
@@ -72,6 +74,7 @@ namespace Shipping.Controllers
 			ViewBag.InsuranceThreshold = insConfig?.GiaTri ?? 5000000;
 		}
 
+		[Authorize(Roles = "Admin, NhanVien")]
 		public IActionResult Index()
 		{
 			var list = _donHangRepo.GetAll();
@@ -171,6 +174,7 @@ namespace Shipping.Controllers
 		}
 
 		[HttpPost]
+		[Authorize(Roles = "Admin, NhanVien")]
 		public async Task<IActionResult> ConfirmPayment(string id, IFormFile file)
 		{
 			var userId = _userManager.GetUserId(User);
@@ -221,6 +225,7 @@ namespace Shipping.Controllers
 
 
 		[HttpPost]
+		[Authorize(Roles = "Admin, NhanVien")]
 		public async Task<IActionResult> AddShipment(ChuyenHangViewModel model)
 		{
 			if (model.ShipperId > 0 && !string.IsNullOrEmpty(model.DonHangId))

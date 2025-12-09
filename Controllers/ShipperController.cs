@@ -50,6 +50,7 @@ namespace Shipping.Controllers
 		}
 
 		// GET: Shipper
+		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> Index()
         {
 			GetData();
@@ -57,8 +58,9 @@ namespace Shipping.Controllers
 			return View(shipper);
 		}
 
-        // GET: Shipper/Details/5
-        public async Task<IActionResult> Details(int? id)
+		// GET: Shipper/Details/5
+		[Authorize(Roles = "Admin")]
+		public async Task<IActionResult> Details(int? id)
         {
 			if (id == null)
 			{
@@ -94,8 +96,9 @@ namespace Shipping.Controllers
 			return View(model);
 		}
 
-        // GET: Shipper/Create
-        public IActionResult Create()
+		// GET: Shipper/Create
+		[Authorize(Roles = "Admin")]
+		public IActionResult Create()
         {
 			GetData();
 			return View(new ShipperViewModel());
@@ -106,7 +109,8 @@ namespace Shipping.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ShipperViewModel shipper)
+		[Authorize(Roles = "Admin")]
+		public async Task<IActionResult> Create(ShipperViewModel shipper)
         {
 			if (!ModelState.IsValid)
 			{
@@ -123,8 +127,9 @@ namespace Shipping.Controllers
 			return RedirectToAction(nameof(Index));
         }
 
-        // GET: Shipper/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+		// GET: Shipper/Edit/5
+		[Authorize(Roles = "Admin")]
+		public async Task<IActionResult> Edit(int? id)
         {
 			if (id == null)
 			{
@@ -161,7 +166,8 @@ namespace Shipping.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(ShipperViewModel shipper)
+		[Authorize(Roles = "Admin")]
+		public async Task<IActionResult> Edit(ShipperViewModel shipper)
         {
 			if (!ModelState.IsValid)
 			{
@@ -179,7 +185,6 @@ namespace Shipping.Controllers
 			return RedirectToAction(nameof(Index));
 		}
 
-        // GET: Shipper/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
 			if (id == null)
@@ -194,6 +199,7 @@ namespace Shipping.Controllers
 		}
 
 		[HttpPost]
+		[Authorize(Roles = "Shipper")]
 		public async Task<IActionResult> UpdateState(string viTri, int trangThai)
 		{
 			var userId = _userManager.GetUserId(User);
@@ -210,7 +216,7 @@ namespace Shipping.Controllers
 			return Json(shippers);
 		}
 
-		[Authorize(Roles = "Shipper")] // Chỉ Shipper mới vào được đây
+		[Authorize(Roles = "Shipper")]
 		public async Task<IActionResult> Dashboard()
 		{
 			var userId = _userManager.GetUserId(User);
@@ -224,7 +230,7 @@ namespace Shipping.Controllers
 		}
 
 		[HttpGet]
-		[Authorize(Roles = "Admin,QuanLy,NhanVien")]
+		[Authorize(Roles = "Admin,NhanVien")]
 		public async Task<IActionResult> ResolveLocation(int type, string? dataId, string? orderId)
 		{
 			// type: 3 (Chi nhánh), 4 (Tiếp nối)

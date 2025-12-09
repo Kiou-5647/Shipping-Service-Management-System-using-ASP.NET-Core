@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Shipping.Data;
@@ -13,6 +14,7 @@ using System.Threading.Tasks;
 
 namespace Shipping.Controllers
 {
+	[Authorize(Roles = "Admin")]
     public class ChiNhanhController : Controller
     {
 		private readonly ICrudService<ChiNhanh> chiNhanhRepo;

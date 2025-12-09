@@ -47,8 +47,8 @@
                             <span class="input-group-text bg-white border-end-0 text-muted">
                                 <i class="fas fa-toggle-on"></i>
                             </span>
-                            <select id="ddlTrangThai" class="form-select border-start-0 ps-0 py-2" style="cursor: pointer;">
-                                <option value="1" class="text-success fw-bold">Sẵn sàng)</option>
+                            <select asp-for="TrangThai" id="ddlTrangThai" class="form-select border-start-0 ps-0 py-2" style="cursor: pointer;">
+                                <option value="1" class="text-success fw-bold">Sẵn sàng</option>
                                 <option value="2" class="text-warning fw-bold">Đang bận</option>
                                 <option value="3" class="text-secondary fw-bold">Nghỉ</option>
                             </select>
@@ -123,7 +123,6 @@
             $.post('/Shipper/UpdateState', { viTri: viTri, trangThai: trangThai }, function (res) {
                 if (res.success) {
                     alert('Cập nhật thành công!');
-                    // Cập nhật text hiển thị ngay lập tức mà không cần F5
                     $('#txtCurrentStatus').text(tenTrangThai);
                 } else {
                     alert('❌ ' + res.msg);

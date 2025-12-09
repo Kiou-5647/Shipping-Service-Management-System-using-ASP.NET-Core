@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Shipping.Data;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace Shipping.Controllers
 {
+	[Authorize(Roles = "Admin")]
     public class ConfigController : Controller
     {
 		private readonly IConfigService _configService;
@@ -22,7 +24,7 @@ namespace Shipping.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> Index()
+		public IActionResult Index()
 		{
 			var configs = _configService.GetAll();
 			var viewModel = new ConfigListViewModel { Configs = configs.ToList() };
