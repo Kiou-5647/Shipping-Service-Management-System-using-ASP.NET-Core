@@ -170,18 +170,6 @@ namespace Shipping.Controllers
 			return Json(result);
 		}
 
-		[HttpGet]
-		public IActionResult GetPhuongXaByTinhThanh(string tinhId)
-		{
-			var allPhuong = _phuongXaRepo.GetAll();
-			var data = allPhuong
-				.Where(p => p.TinhThanhId == tinhId)
-				.Select(p => new { id = p.Id, name = p.TenPhuongXa })
-				.ToList();
-
-			return Json(data);
-		}
-
 		[HttpPost]
 		public async Task<IActionResult> ConfirmPayment(string id, IFormFile file)
 		{

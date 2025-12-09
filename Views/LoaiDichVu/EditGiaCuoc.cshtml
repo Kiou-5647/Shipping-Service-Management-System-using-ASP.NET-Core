@@ -7,90 +7,89 @@
     var maxTime = Model.ThoiGianToiDa;
 }
 
-<h1 class="text-center">Cấu Hình Giá Cước Dịch Vụ: @Model.TenDichVu</h1>
-<hr />
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-}
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
-}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <div>
+            <h3 class="fw-bold text-primary mb-1">@Model.TenDichVu</h3>
+            <span class="badge bg-secondary">@Model.MaDV</span>
+            <span class="text-muted small ms-2">
+                <i class="fas fa-weight-hanging me-1"></i>Mốc: <b>@Model.MocCanNang kg</b> |
+                <i class="fas fa-plus me-1"></i>Bước nhảy: <b>@Model.DonViTangThem kg</b>
+            </span>
+        </div>
+        <div>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-cog me-1"></i> Sửa thông tin chung
+            </a>
+        </div>
+    </div>
 
-<p>Thông tin chung: Mốc Cân Nặng (@Model.MocCanNang kg), Đơn Vị Tăng Thêm (@Model.DonViTangThem kg).</p>
-<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-link">Chỉnh sửa thông tin chung</a>
-
-<div class="row">
-    @foreach (var item in giaCuocList)
+    @if (TempData["SuccessMessage"] != null)
     {
-        <div class="col-md-6">
-            <form asp-action="EditGiaCuoc" method="post">
-                <input type="hidden" name="Id" value="@item.Id" />
-                <input type="hidden" name="LoaiDichVuId" value="@item.LoaiDichVuId" />
-                <input type="hidden" name="LoaiVungGia" value="@((int)item.LoaiVungGia)" />
+        <div class="alert alert-success shadow-sm"><i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger shadow-sm"><i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]</div>
+    }
 
-                <h4 class="mt-3">
-                    Giá cước cho vùng:
-                    @{
-                        var text = "";
-                        switch (item.LoaiVungGia)
-                        {
-                            case Shipping.Models.Enums.LoaiVungGia.NoiTinh:
-                                text = "Nội tỉnh";
-                                break;
-                            case Shipping.Models.Enums.LoaiVungGia.NoiMien:
-                                text = "Nội miền";
-                                break;
-                            case Shipping.Models.Enums.LoaiVungGia.LienMien:
-                                text = "Liên miền";
-                                break;
-                        }
-                    }
-                    @text
-                </h4>
-                <div class="row border p-3 mb-4">
+    <div class="row g-4">
+        @foreach (var item in giaCuocList)
+        {
+            <div class="col-lg-4 col-md-6">
+                <div class="card shadow border-0 h-100">
+                    <div class="card-header bg-light border-bottom text-center py-3">
+                        <h5 class="m-0 fw-bold text-dark text-uppercase">@item.LoaiVungGia.ToString()</h5>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="EditGiaCuoc" method="post">
+                            <input type="hidden" name="Id" value="@item.Id" />
+                            <input type="hidden" name="LoaiDichVuId" value="@item.LoaiDichVuId" />
+                            <input type="hidden" name="LoaiVungGia" value="@item.LoaiVungGia" />
 
-                    <div class="col-md-6">
-                        <div class="form-group mb-3">
-                            <label>Giá Cơ Bản (VND)</label>
-                            <input name="GiaCoBan" value="@item.GiaCoBan" class="form-control" step="500" type="number" min="0" />
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group mb-3">
-                            <label>Giá Tăng Thêm (VND)</label>
-                            <input name="GiaTangThem" value="@item.GiaTangThem" class="form-control" step="500" type="number" min="0" />
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group mb-3">
-                            <label>Giá Vượt (VND)</label>
-                            <input name="GiaVuot" value="@item.GiaVuot" class="form-control" type="number" step="500" min="0" />
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group mb-3">
-                            <label>Thời Gian Giao (Ngày)</label>
-                            <input name="ThoiGianGiao" value="@item.ThoiGianGiao" class="form-control" step="1" type="number" min="@minTime" max="@maxTime" />
-                        </div>
-                    </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-muted">Giá cơ bản (Mốc đầu)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="fas fa-tag text-primary"></i></span>
+                                    <input name="GiaCoBan" value="@item.GiaCoBan.ToString("F0")" class="form-control fw-bold" type="number" step="500" min="0" />
+                                    <span class="input-group-text small">₫</span>
+                                </div>
+                            </div>
 
-                    <div class="col-md-12 text-end">
-                        <button type="submit" class="btn btn-sm btn-success">Lưu @item.LoaiVungGia.ToString()</button>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-muted">Giá tăng thêm (Mỗi bước nhảy)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="fas fa-level-up-alt text-warning"></i></span>
+                                    <input name="GiaVuot" value="@item.GiaVuot.ToString("F0")" class="form-control fw-bold" type="number" step="500" min="0" />
+                                    <span class="input-group-text small">₫</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold small text-muted">Thời gian giao dự kiến</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="far fa-clock text-info"></i></span>
+                                    <input name="ThoiGianGiao" value="@item.ThoiGianGiao" class="form-control fw-bold" step="1" type="number" min="@minTime" max="@maxTime" />
+                                    <span class="input-group-text small">Ngày</span>
+                                </div>
+                                <div class="form-text small">Trong khoảng @minTime - @maxTime ngày</div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-success fw-bold">
+                                    <i class="fas fa-save me-2"></i> Lưu Cấu hình
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-            </form>
-        </div>
-    }
-</div>
+            </div>
+        }
+    </div>
 
-<div class="text-center my-4">
-    <a asp-action="Index" class="btn btn-outline-secondary">Trở về danh sách dịch vụ</a>
+    <div class="text-center mt-5">
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary px-4">
+            <i class="fas fa-arrow-left me-2"></i> Hoàn tất & Trở về chi tiết dịch vụ
+        </a>
+    </div>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

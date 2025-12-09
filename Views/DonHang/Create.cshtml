@@ -268,12 +268,12 @@
 
                 if (tinhId) {
                     $phuongSelect.empty().append('<option value="">Đang tải...</option>');
-                    var url = '@Url.Action("GetPhuongXaByTinhThanh", "DonHang")';
+                    var url = '@Url.Action("GetPhuongXaByTinhThanh", "Address")';
 
                     $.ajax({
                         url: url,
                         type: 'GET',
-                        data: { tinhId: tinhId },
+                        data: { tinhThanhId: tinhId },
                         success: function(data) {
                             $phuongSelect.empty().append('<option value="">-- Chọn Phường/Xã --</option>');
                             $.each(data, function(index, item) {
@@ -339,7 +339,7 @@
                     TinhGuiId: $('#TinhGuiId').val(),
                     TinhNhanId: $('#TinhNhanId').val(),
                     LoaiDichVuId: parseInt($('#LoaiDichVuId').val()) || 0,
-                    KhoiLuong: parseFloat($('#TrongLuongThuc').val()) || 0,
+                    TrongLuongThuc: parseFloat($('#TrongLuongThuc').val()) || 0,
                     ChieuDai: parseFloat($('#ChieuDai').val()) || 0,
                     ChieuRong: parseFloat($('#ChieuRong').val()) || 0,
                     ChieuCao: parseFloat($('#ChieuCao').val()) || 0,

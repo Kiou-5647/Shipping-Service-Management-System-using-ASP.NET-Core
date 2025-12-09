@@ -87,7 +87,12 @@ namespace Shipping.Repositories.UserService
 					return new ReturnState() { Completed = false, Message = $"Tạo tài khoản thất bại: {result.Errors.FirstOrDefault()?.Description}" };
 			}
 
-			await userManager.AddToRoleAsync(user, "NhanVien");
+			if(model.IsQuanLy)
+				await userManager.AddToRoleAsync(user, "Admin");
+			else
+				await userManager.AddToRoleAsync(user, "NhanVien");
+
+			await userManager.UpdateSecurityStampAsync(user);
 
 			var nv = new NhanVien
 			{
@@ -159,6 +164,19 @@ namespace Shipping.Repositories.UserService
 				await userManager.SetPhoneNumberAsync(user, model.SDT);
 			}
 
+			if (model.IsQuanLy && !nvToEdit.IsQuanLy)
+			{
+				await userManager.RemoveFromRoleAsync(user, "NhanVien");
+				await userManager.AddToRoleAsync(user, "Admin");
+			}
+			else if (!model.IsQuanLy && nvToEdit.IsQuanLy)
+			{
+				await userManager.RemoveFromRoleAsync(user, "Admin");
+				await userManager.AddToRoleAsync(user, "NhanVien");
+			}
+
+			await userManager.UpdateSecurityStampAsync(user);
+
 			var updateResult = await userManager.UpdateAsync(user);
 			if (!updateResult.Succeeded)
 			{
@@ -192,12 +210,16 @@ namespace Shipping.Repositories.UserService
 		{
 			return context.NhanViens.Include(nv => nv.User)
 				.Include(nv => nv.ChiNhanh)
+				.Include(nv => nv.TinhThanh)
+				.Include(nv => nv.PhuongXa)
 				.Where(nv => !nv.IsDeleted);
 		}
 
 		public IEnumerable<NhanVien> GetAllActive()
 		{
 			return context.NhanViens.Include(nv => nv.User)
+				.Include(nv => nv.TinhThanh)
+				.Include(nv => nv.PhuongXa)
 				.Include(nv => nv.ChiNhanh).ThenInclude(c => c.TinhThanh)
 				.Include(nv => nv.ChiNhanh).ThenInclude(c => c.PhuongXa)
 				.Where(nv => !nv.IsDeleted && (nv.User.LockoutEnd == null || nv.User.LockoutEnd < DateTimeOffset.Now));
@@ -206,6 +228,8 @@ namespace Shipping.Repositories.UserService
 		public IEnumerable<NhanVien> GetAllInactive()
 		{
 			return context.NhanViens.Include(nv => nv.User)
+				.Include(nv => nv.TinhThanh)
+				.Include(nv => nv.PhuongXa)
 				.Include(nv => nv.ChiNhanh).ThenInclude(c => c.TinhThanh)
 				.Include(nv => nv.ChiNhanh).ThenInclude(c => c.PhuongXa)
 				.Where(nv => nv.IsDeleted || (nv.User.LockoutEnd != null || nv.User.LockoutEnd >= DateTimeOffset.Now));
@@ -215,6 +239,8 @@ namespace Shipping.Repositories.UserService
 		{
 			if (id == null || id == 0) return null;
 			return await context.NhanViens.Include(nv => nv.User)
+				.Include(nv => nv.TinhThanh)
+				.Include(nv => nv.PhuongXa)
 				.Include(nv => nv.ChiNhanh).ThenInclude(c => c.TinhThanh)
 				.Include(nv => nv.ChiNhanh).ThenInclude(c => c.PhuongXa)
 				.FirstOrDefaultAsync(nv => nv.Id == id && !nv.IsDeleted);

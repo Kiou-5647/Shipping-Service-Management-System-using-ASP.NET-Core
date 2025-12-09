@@ -1,52 +1,64 @@
 ﻿@model Shipping.Models.ChiNhanh
 
 @{
-    ViewData["Title"] = "Quản lý chi nhánh";
+    ViewData["Title"] = "Chi tiết chi nhánh";
 }
-<div class="row">
-    <div class="col-md-4 offset-md-4">
-        <div class="row">
-            <h1 class="text-center">Thông tin chi nhánh</h1>
-            <hr />
-        </div>
-        <dl class="row">
-            <dt class="col-md-4">
-                @Html.DisplayNameFor(model => model.TenChiNhanh)
-            </dt>
-            <dd class="col-md-8">
-                @Html.DisplayFor(model => model.TenChiNhanh)
-            </dd>
-            <dt class="col-md-4">
-                @Html.DisplayNameFor(model => model.SDT)
-            </dt>
-            <dd class="col-md-8">
-                @Html.DisplayFor(model => model.SDT)
-            </dd>
-            <dt class="col-md-4">
-                @Html.DisplayNameFor(model => model.TinhThanhId)
-            </dt>
-            <dd class="col-md-8">
-                @Html.DisplayFor(model => model.TinhThanh.TenTinhThanh)
-            </dd>
-            <dt class="col-md-4">
-                @Html.DisplayNameFor(model => model.PhuongXaId)
-            </dt>
-            <dd class="col-md-8">
-                @Html.DisplayFor(model => model.PhuongXa.TenPhuongXa)
-            </dd>
-            <dt class="col-md-4">
-                @Html.DisplayNameFor(model => model.DiaChi)
-            </dt>
-            <dd class="col-md-8">
-                @Html.DisplayFor(model => model.DiaChi)
-            </dd>
-        </dl>
 
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-4 offset-md-4 text-center">
-        <a class="btn btn-outline-warning" asp-action="Edit" asp-route-id="@Model.Id">Cập nhật</a> &nbsp;
-        <a asp-action="Index" class="btn btn-outline-secondary">Trở về danh sách</a>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-white py-3 border-bottom d-flex align-items-center">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                        <i class="fas fa-store fa-lg"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0 fw-bold text-primary">@Html.DisplayFor(model => model.TenChiNhanh)</h5>
+                        <small class="text-muted">ID: @Model.Id</small>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <h6 class="text-uppercase text-muted fw-bold small mb-3">
+                                <i class="fas fa-phone-alt me-2"></i>Thông tin liên hệ
+                            </h6>
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4 text-muted">Số điện thoại:</dt>
+                                <dd class="col-sm-8 fw-bold text-success fs-5">@Html.DisplayFor(model => model.SDT)</dd>
+                            </dl>
+                        </div>
+
+                        <hr class="my-0">
+
+                        <div class="col-12">
+                            <h6 class="text-uppercase text-muted fw-bold small mb-3">
+                                <i class="fas fa-map-marker-alt me-2"></i>Địa chỉ
+                            </h6>
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4 text-muted">Tỉnh/Thành phố:</dt>
+                                <dd class="col-sm-8 fw-bold">@Html.DisplayFor(model => model.TinhThanh.TenTinhThanh)</dd>
+
+                                <dt class="col-sm-4 text-muted">Phường/Xã:</dt>
+                                <dd class="col-sm-8">@Html.DisplayFor(model => model.PhuongXa.TenPhuongXa)</dd>
+
+                                <dt class="col-sm-4 text-muted">Địa chỉ chi tiết:</dt>
+                                <dd class="col-sm-8 text-primary">@Html.DisplayFor(model => model.DiaChi)</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-light py-3 d-flex justify-content-end gap-2">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Danh sách
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning fw-bold">
+                        <i class="fas fa-edit me-1"></i> Cập nhật
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

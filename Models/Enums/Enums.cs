@@ -96,8 +96,14 @@ namespace Shipping.Models.Enums
 		[Display(Name = "Giá trị")]
 		Fixed = 2,
 
+		[Display(Name = "Trọng lượng")]
+		Mass = 3,
+
+		[Display(Name = "Độ dài")]
+		Length = 4,
+
 		[Display(Name = "Không có")]
-		None = 3
+		None = 5,
 	}
 
 	public enum LoaiDiaDiem

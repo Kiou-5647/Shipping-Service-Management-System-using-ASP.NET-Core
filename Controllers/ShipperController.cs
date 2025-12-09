@@ -88,7 +88,9 @@ namespace Shipping.Controllers
 				IsDeleted = shipper.IsDeleted
 			};
 
-			GetData();
+			ViewBag.TenTinhThanh = shipper.TinhThanh.TenTinhThanh;
+			ViewBag.TenPhuongXa = shipper.PhuongXa.TenPhuongXa;
+			ViewBag.TenChiNhanh = shipper.ChiNhanh != null ? shipper.ChiNhanh.TenChiNhanh : null;
 			return View(model);
 		}
 
@@ -191,22 +193,6 @@ namespace Shipping.Controllers
 			return RedirectToAction(nameof(Index));
 		}
 
-		[HttpGet]
-		public IActionResult GetPhuongXaByTinhThanh(string TinhThanhId)
-		{
-			var phuongXaList = _phuongXaRepo.GetAll()
-									   .Where(px => px.TinhThanhId == TinhThanhId)
-									   .Select(px => new {
-										   value = px.Id,
-										   text = px.TenPhuongXa
-									   })
-									   .ToList();
-
-			return Json(phuongXaList);
-		}
-
-
-
 		[HttpPost]
 		public async Task<IActionResult> UpdateState(string viTri, int trangThai)
 		{
@@ -258,6 +244,8 @@ namespace Shipping.Controllers
 
 			return Json(new { locationId = locationId });
 		}
+
+
 
 	}
 }

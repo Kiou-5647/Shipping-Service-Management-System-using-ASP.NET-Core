@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ using System.Threading.Tasks;
 
 namespace Shipping.Controllers
 {
+	[Authorize(Roles = "Admin, NhanVien")]
     public class KhachHangController : Controller
     {
 		private readonly IUserService<KhachHang, KhachHangViewModel> _khachHangRepo;

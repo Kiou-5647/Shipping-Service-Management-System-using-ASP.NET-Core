@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Shipping.Models;
 using Shipping.Repositories.CrudService;
@@ -9,19 +11,23 @@ using Shipping.ViewModels;
 
 namespace Shipping.Controllers
 {
-    public class NhanVienController : Controller
+	[Authorize(Roles = "Admin")]
+	public class NhanVienController : Controller
     {
+		private readonly UserManager<IdentityUser> _userManager;
 		private readonly IUserService<NhanVien, NhanVienViewModel> _nhanVienRepo;
 		private readonly ICrudService<ChiNhanh> _chiNhanhRepo;
 		private readonly IGeoService<TinhThanh> _tinhThanhRepo;
 		private readonly IGeoService<PhuongXa> _phuongXaRepo;
 
 		public NhanVienController(
+			UserManager<IdentityUser> userManager,
 			IUserService<NhanVien, NhanVienViewModel> nhanVienRepo,
 			ICrudService<ChiNhanh> chiNhanhRepo,
 			IGeoService<TinhThanh> tinhThanhRepo,
 			IGeoService<PhuongXa> phuongXaRepo)
 		{
+			_userManager = userManager;
 			_nhanVienRepo = nhanVienRepo;
 			_chiNhanhRepo = chiNhanhRepo;
 			_tinhThanhRepo = tinhThanhRepo;
@@ -55,7 +61,9 @@ namespace Shipping.Controllers
 			{
 				return NotFound();
 			}
-			GetData();
+			ViewBag.TenTinhThanh = nhanVien.TinhThanh.TenTinhThanh;
+			ViewBag.TenPhuongXa = nhanVien.PhuongXa.TenPhuongXa;
+			ViewBag.TenChiNhanh = nhanVien.ChiNhanh != null ? nhanVien.ChiNhanh.TenChiNhanh : null;
 			return View(nhanVien);
 		}
 
@@ -155,24 +163,33 @@ namespace Shipping.Controllers
 			return RedirectToAction(nameof(Index));
 		}
 
-		[HttpGet]
-		public IActionResult GetPhuongXaByTinhThanh(string TinhThanhId)
+
+		public async Task<IActionResult> ThayDoiQuyenHan(int id)
 		{
-			if (string.IsNullOrEmpty(TinhThanhId))
+			var nhanVien = await _nhanVienRepo.GetById(id);
+			if (nhanVien == null)
+				return NotFound();
+
+			var user = await _userManager.FindByIdAsync(nhanVien.UserId);
+			if (user == null)
+				return NotFound();
+
+			if (nhanVien.IsQuanLy)
 			{
-				return Json(new List<SelectListItem>());
+				await _userManager.RemoveFromRoleAsync(user, "Admin");
+				await _userManager.AddToRoleAsync(user, "NhanVien");
+			}
+			else
+			{
+				await _userManager.RemoveFromRoleAsync(user, "NhanVien");
+				await _userManager.AddToRoleAsync(user, "Admin");
 			}
 
-			var phuongXaList = _phuongXaRepo.GetAll()
-											.Where(p => p.TinhThanhId == TinhThanhId)
-											.Select(p => new
-											{
-												Value = p.Id,
-												Text = p.TenPhuongXa
-											})
-											.ToList();
+			nhanVien.IsQuanLy = !nhanVien.IsQuanLy;
+			_nhanVienRepo.Save();
+			await _userManager.UpdateSecurityStampAsync(user);
 
-			return Json(phuongXaList);
+			return RedirectToAction(nameof(Index));
 		}
 	}
 }

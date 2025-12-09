@@ -5,112 +5,114 @@
     int index = 1;
 }
 
-
-<h1 class="text-center">Danh sách shipper</h1>
-
-<a asp-action="Create" class="btn btn-primary">Thêm shipper mới</a>
-<hr />
-
-<table class="table table-bordered">
-    <thead class="table-dark justify-content-center">
-        <tr class="text-center">
-            <th>
-                #
-            </th>
-            <th class="col-1">
-                Ảnh đại diện
-            </th>
-            <th class="col-2">
-                Họ tên
-            </th>
-            <th class="col-1">
-                SDT
-            </th>
-            <th class="col-1">
-                Loại
-            </th>
-            <th>
-                Trạng thái
-            </th>
-            <th class="col-3">
-                Chi nhánh
-            </th>
-            <th>
-                Tác vụ
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr class="align-middle text-center">
-                <td>
-                    <b>@(index++)</b>
-                </td>
-                <td>
-                    @if (!string.IsNullOrEmpty(item.HinhAnh))
-                    {
-                        <img src="/images/avatar/shipper/@Html.DisplayFor(modelItem => item.HinhAnh)"
-                             alt="Ảnh đại diện"
-                             style="max-height: 100px; object-fit: cover;"
-                             class="avatar" />
-                    }
-                    else
-                    {
-                        <img src="../images/avatar/default_image.jpg"
-                             alt="Ảnh đại diện"
-                             style="max-height: 100px; object-fit: cover;"
-                             class="avatar" />
-                    }
-                </td>
-                <td class="text-start">
-                    @Html.DisplayFor(modelItem => item.Ten)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.User.PhoneNumber)
-                </td>
-                <td>
-                    @(item.LoaiShipper == Shipping.Models.Enums.LoaiShipper.GiaoHang ? "Giao hàng" : "Vận chuyển")
-                </td>
-                <td>
-                    @{
-                        var trangThai = "";
-                        var stateBadge = "";
-                        switch (item.TrangThai)
+<div class="container-fluid py-4">
+    <div class="card shadow border-0">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="m-0 fw-bold"><i class="fas fa-shipping-fast me-2"></i>Danh sách Shipper</h5>
+            <a asp-action="Create" class="btn btn-light text-primary fw-bold btn-sm shadow-sm">
+                <i class="fas fa-plus me-1"></i> Thêm mới
+            </a>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-secondary">
+                        <tr class="text-center text-uppercase small fw-bold">
+                            <th style="width: 50px;">#</th>
+                            <th style="width: 100px;">Ảnh</th>
+                            <th class="text-start">Họ tên & Email</th>
+                            <th>SĐT</th>
+                            <th>Loại</th>
+                            <th>Trạng thái</th>
+                            <th>Chi nhánh</th>
+                            <th style="width: 150px;">Tác vụ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
                         {
-                            case Shipping.Models.Enums.TrangThaiShipper.SanSang:
-                                trangThai = "Sẵn sàng";
-                                stateBadge = "bg-success";
-                                break;
-                            case Shipping.Models.Enums.TrangThaiShipper.Ban:
-                                trangThai = "Bận";
-                                stateBadge = "bg-warning text-black";
-                                break;
-                            default:
-                                trangThai = "Nghỉ";
-                                stateBadge = "bg-danger text-white";
-                                break;
+                            <tr class="text-center">
+                                <td class="text-muted">@(index++)</td>
+                                <td>
+                                    <div class="avatar-wrapper">
+                                        @if (!string.IsNullOrEmpty(item.HinhAnh))
+                                        {
+                                            <img src="/images/avatar/shipper/@Html.DisplayFor(modelItem => item.HinhAnh)"
+                                                 class="rounded-circle shadow-sm border"
+                                                 style="width: 50px; height: 50px; object-fit: cover;"
+                                                 alt="Avatar" />
+                                        }
+                                        else
+                                        {
+                                            <img src="/images/avatar/default_image.jpg"
+                                                 class="rounded-circle shadow-sm border"
+                                                 style="width: 50px; height: 50px; object-fit: cover;"
+                                                 alt="Default" />
+                                        }
+                                    </div>
+                                </td>
+                                <td class="text-start">
+                                    <div class="fw-bold text-dark">@Html.DisplayFor(modelItem => item.Ten)</div>
+                                    <small class="text-muted"><i class="far fa-envelope me-1"></i>@Html.DisplayFor(modelItem => item.User.Email)</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">@Html.DisplayFor(modelItem => item.User.PhoneNumber)</span>
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.LoaiShipper)
+                                </td>
+                                <td>
+                                    @{
+                                        string trangThai = "";
+                                        string stateBadge = "";
+                                        switch (item.TrangThai)
+                                        {
+                                            case Shipping.Models.Enums.TrangThaiShipper.SanSang:
+                                                trangThai = "Sẵn sàng";
+                                                stateBadge = "bg-success";
+                                                break;
+                                            case Shipping.Models.Enums.TrangThaiShipper.Ban:
+                                                trangThai = "Bận";
+                                                stateBadge = "bg-warning text-dark";
+                                                break;
+                                            default:
+                                                trangThai = "Nghỉ";
+                                                stateBadge = "bg-secondary";
+                                                break;
+                                        }
+                                    }
+                                    <span class="badge @stateBadge rounded-pill">@trangThai</span>
+                                </td>
+                                <td class="small text-muted">
+                                    @if (item.ChiNhanh != null)
+                                    {
+                                        <i class="fas fa-building me-1"></i> 
+                                        @Html.DisplayFor(modelItem => item.ChiNhanh.TenChiNhanh)
+                                    }
+                                    else
+                                    {
+                                        <span class="text-danger fst-italic">Chưa phân công</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="Sửa">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info" title="Chi tiết">
+                                            <i class="fas fa-info-circle"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Xóa"
+                                           onclick="return confirm('Bạn có chắc chắn muốn xóa shipper @item.Ten không?');">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
                         }
-                    }
-                    <span class="badge @stateBadge">@trangThai</span>
-                </td>
-                @if (item.ChiNhanh != null)
-                {
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ChiNhanh.TenChiNhanh)
-                    </td>
-                }
-                else
-                {
-                    <td>Không thuộc chi nhánh nào</td>
-                }
-                <td>
-                    <a class="btn btn-outline-warning" asp-action="Edit" asp-route-id="@item.Id">Cập nhật</a> &nbsp;
-                    <a class="btn btn-outline-success" asp-action="Details" asp-route-id="@item.Id">Chi tiết</a> &nbsp;
-                    <a class="btn btn-outline-danger" asp-action="Delete" asp-route-id="@item.Id"
-                       onclick="return confirm('Bạn có chắc chắn muốn xóa shipper này không?');">Xóa</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

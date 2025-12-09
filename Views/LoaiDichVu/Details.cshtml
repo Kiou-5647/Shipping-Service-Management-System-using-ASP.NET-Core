@@ -1,181 +1,177 @@
 ﻿@model Shipping.Models.LoaiDichVu
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Chi tiết dịch vụ";
     var configs = (IEnumerable<Config>)ViewBag.Config;
+    // Giữ nguyên logic lấy config của bạn
     Config? hangnang = configs.FirstOrDefault(s => s.Id == "HEAVY_THRESHOLD");
     Config? gioihan = configs.FirstOrDefault(s => s.Id == "WEIGHT_LIMIT");
 }
 
-<h1 class="text-center">Thông tin dịch vụ giao hàng</h1>
-<hr />
-<div class="row">
-    <div class="col-md-6">
-        <dl class="row">
-            <dt class="col-md-4">
-                Tên dịch vụ:
-            </dt>
-            <dd class="col-md-8">
-                @Model.TenDichVu
-            </dd>
-            <dt class="col-md-4">
-                Thời gian giao:
-            </dt>
-            <dd class="col-md-8">
-                Từ @Model.ThoiGianToiThieu - @Model.ThoiGianToiDa ngày
-            </dd>
-            <dt class="col-md-4">
-                Mốc cân nặng:
-            </dt>
-            <dd class="col-md-8">
-                @(Model.MocCanNang)kg
-            </dd>
-        </dl>
-    </div>
-    <div class="col-md-6">
-        <dl class="row">
-            <dt class="col-md-4">
-                Mã dịch vụ:
-            </dt>
-            <dd class="col-md-8">
-                @Model.MaDV
-            </dd>
-            <dt class="col-md-4">
-                Mô tả:
-            </dt>
-            <dd class="col-md-8">
-                @Model.MoTa
-            </dd>
-            <dt class="col-md-4">
-                Đơn vị tăng thêm:
-            </dt>
-            <dd class="col-md-8">
-                @(Model.DonViTangThem)kg
-            </dd>
-        </dl>
-    </div>
-</div>
+<div class="container py-4">
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+            <h5 class="m-0 fw-bold text-primary">
+                <i class="fas fa-box-open me-2"></i>@Model.TenDichVu
+                <span class="badge bg-secondary ms-2 text-white" style="font-size: 0.6em;">@Model.MaDV</span>
+            </h5>
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="form-group mb-3 text-center">
-            <a class="btn btn-outline-warning" asp-action="Edit" asp-route-id="@Model.Id">Cập nhật</a> &nbsp;
-            <a asp-action="Index" class="btn btn-outline-secondary">Trở về danh sách</a>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning fw-bold btn-sm shadow-sm">
+                    <i class="fas fa-edit me-1"></i> Cập nhật Dịch vụ
+                </a>
+            }
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6 border-end">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted">Thời gian giao:</dt>
+                        <dd class="col-sm-8 fw-bold text-dark">@Model.ThoiGianToiThieu - @Model.ThoiGianToiDa ngày</dd>
+
+                        <dt class="col-sm-4 text-muted">Mô tả:</dt>
+                        <dd class="col-sm-8 text-secondary">@Model.MoTa</dd>
+                    </dl>
+                </div>
+                <div class="col-md-6 ps-md-4">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-6 text-muted">Mốc cân nặng:</dt>
+                        <dd class="col-sm-6 fw-bold text-success">@Model.MocCanNang.ToString("N0") kg</dd>
+
+                        <dt class="col-sm-6 text-muted">Đơn vị tính thêm:</dt>
+                        <dd class="col-sm-6 fw-bold text-info">@Model.DonViTangThem.ToString("N1") kg</dd>
+                    </dl>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
-
-<h3 class="text-center">Bảng giá giao hàng</h3>
-<table class="table table-bordered">
-    <thead class="table-dark justify-content-center">
-        <tr class="text-center">
-            <th class="col-md-3">
-                Trọng lượng
-            </th>
-            <th class="col-md-3">
-                Nội tỉnh
-            </th>
-            <th class="col-md-3">
-                Nội miền
-            </th>
-            <th class="col-md-3">
-                Liên miền
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (!Model.CauTrucGiaCuocs.All(g => g.GiaTangThem == 0))
-        {
-            decimal w0 = 0;
-            decimal index = 0;
-            @while (w0 < Model.MocCanNang)
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-success text-white py-2 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 fw-bold"><i class="fas fa-tags me-2"></i>Bảng Giá Cước Chi Tiết</h6>
+            @if (User.IsInRole("Admin"))
             {
-                decimal w = w0 + Model.DonViTangThem;
-                <tr class="text-center">
-                    @if (w0 == 0)
-                    {
-                        <td class="text-start">Đến dưới @((w * 1000).ToString("N0")) gram</td>
-                    }
-                    else
-                    {
-                        <td class="text-start">Từ @((w0 * 1000).ToString("N0")) đến dưới @((w * 1000).ToString("N0")) gram</td>
-                    }
-                    @foreach (var item in Model.CauTrucGiaCuocs)
-                    {
-                        @if (w0 == 0)
+                <a asp-action="EditGiaCuoc" asp-route-id="@Model.Id" class="btn btn-warning fw-bold btn-sm shadow-sm">
+                    <i class="fas fa-edit me-1"></i> Cập nhật giá cước
+                </a>
+            }
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover mb-0 text-center align-middle">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="text-start ps-3" style="width: 30%">Trọng lượng</th>
+                            @foreach (var item in Model.CauTrucGiaCuocs)
+                            {
+                                <th class="text-uppercase text-primary">@Html.DisplayFor(model => item.LoaiVungGia)</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.CauTrucGiaCuocs.All(g => g.GiaTangThem == 0))
                         {
-                            <td>@(item.GiaCoBan.ToString("N0"))</td>
+                            decimal w0 = 0;
+                            decimal index = 0;
+                            @while (w0 < Model.MocCanNang)
+                            {
+                                decimal w = w0 + Model.DonViTangThem;
+                                <tr>
+                                    @if (w0 == 0)
+                                    {
+                                        <td class="text-start ps-3 fw-bold text-muted">Đến dưới @((w * 1000).ToString("N0")) gram</td>
+                                    }
+                                    else
+                                    {
+                                        <td class="text-start ps-3 fw-bold text-muted">Từ @((w0 * 1000).ToString("N0")) đến dưới @((w * 1000).ToString("N0")) gram</td>
+                                    }
+
+                                    @foreach (var item in Model.CauTrucGiaCuocs)
+                                    {
+                                        @if (w0 == 0)
+                                        {
+                                            <td class="fw-bold text-dark">@(item.GiaCoBan.ToString("N0")) ₫</td>
+                                        }
+                                        else
+                                        {
+                                            <td class="fw-bold text-dark">@((item.GiaCoBan + index * item.GiaTangThem).ToString("N0")) ₫</td>
+                                        }
+                                    }
+                                </tr>
+                                w0 += Model.DonViTangThem;
+                                index++;
+                            }
+
+                            <tr class="bg-light">
+                                <td class="text-start ps-3 fw-bold text-danger">
+                                    Mỗi @(Model.DonViTangThem.ToString("N1"))kg tiếp theo từ @(Model.MocCanNang)kg
+                                </td>
+                                @foreach (var item in Model.CauTrucGiaCuocs)
+                                {
+                                    <td class="text-danger fw-bold">+@(item.GiaVuot.ToString("N0")) ₫</td>
+                                }
+                            </tr>
                         }
                         else
                         {
-                            <td>@((item.GiaCoBan + index * item.GiaTangThem).ToString("N0"))</td>
+                            <tr>
+                                <td class="text-start ps-3 fw-bold text-muted">
+                                    Đến @Model.MocCanNang.ToString("N0")kg
+                                </td>
+                                @foreach (var item in Model.CauTrucGiaCuocs)
+                                {
+                                    <td class="fw-bold text-dark">@(item.GiaCoBan.ToString("N0")) ₫</td>
+                                }
+                            </tr>
+                            <tr class="bg-light">
+                                <td class="text-start ps-3 fw-bold text-danger">
+                                    Mỗi @Model.DonViTangThem.ToString("N1")kg tiếp theo
+                                </td>
+                                @foreach (var item in Model.CauTrucGiaCuocs)
+                                {
+                                    <td class="text-danger fw-bold">+@(item.GiaVuot.ToString("N0")) ₫</td>
+                                }
+                            </tr>
                         }
-                    }
-                </tr>
-                w0 += Model.DonViTangThem;
-                index++;
-            }
-            <tr class="text-center">
-                <td class="text-start">
-                    Mỗi @(Model.DonViTangThem.ToString("N1"))kg tiếp theo
-                </td>
-                @foreach (var item in Model.CauTrucGiaCuocs)
-                {
-                    <td>@(item.GiaVuot.ToString("N0"))</td>
-                }
-            </tr>
-        }
-        else
-        {
-            <tr class="text-center">
-                <td class="text-start">
-                    Đến @Model.MocCanNang.ToString("N0")kg
-                </td>
-                @foreach (var item in Model.CauTrucGiaCuocs)
-                {
-                    <td>@(item.GiaCoBan.ToString("N0"))</td>
-                }
-            </tr>
-            <tr class="text-center">
-                <td class="text-start">
-                    Mỗi @Model.DonViTangThem.ToString("N1")kg tiếp theo
-                </td>
-                @foreach (var item in Model.CauTrucGiaCuocs)
-                {
-                    <td>@(item.GiaVuot.ToString("N0"))</td>
-                }
-            </tr>
-        }
-    </tbody>
-</table>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-<h3 class="text-center">Bảng thời gian dự kiến</h3>
-<table class="table table-bordered">
-    <thead class="table-dark justify-content-center">
-        <tr class="text-center">
-            <th class="col-md-3">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-secondary text-white py-2">
+            <h6 class="m-0 fw-bold"><i class="fas fa-clock me-2"></i>Thời Gian Vận Chuyển Dự Kiến</h6>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped mb-0 text-center align-middle">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="text-start ps-3" style="width: 30%">Khu vực</th>
+                            <th class="col-md-3">Nội tỉnh</th>
+                            <th class="col-md-3">Nội miền</th>
+                            <th class="col-md-3">Liên miền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-start ps-3 fw-bold text-muted">Thời gian cam kết</td>
+                            @foreach (var item in Model.CauTrucGiaCuocs)
+                            {
+                                <td><span class="badge bg-white text-dark border shadow-sm">@item.ThoiGianGiao ngày</span></td>
+                            }
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-            </th>
-            <th class="col-md-3">
-                Nội tỉnh
-            </th>
-            <th class="col-md-3">
-                Nội miền
-            </th>
-            <th class="col-md-3">
-                Liên miền
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr class="text-center">
-            <td class="text-start">Thời gian giao dự kiến</td>
-            @foreach (var item in Model.CauTrucGiaCuocs)
-            {
-                <td>@(item.ThoiGianGiao.ToString("N0")) ngày</td>
-            }
-        </tr>
-    </tbody>
-</table>
-
+    <div class="mt-4 text-end">
+        <a asp-action="Index" class="btn btn-secondary"><i class="fas fa-arrow-left me-2"></i>Quay lại danh sách</a>
+    </div>
+</div>

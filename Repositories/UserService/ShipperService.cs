@@ -198,6 +198,8 @@ namespace Shipping.Repositories.UserService
 		public IEnumerable<Shipper> GetAll()
 		{
 			return context.Shippers.Include(s => s.User)
+				.Include(nv => nv.TinhThanh)
+				.Include(nv => nv.PhuongXa)
 				.Include(nv => nv.ChiNhanh).ThenInclude(c => c.TinhThanh)
 				.Include(nv => nv.ChiNhanh).ThenInclude(c => c.PhuongXa)
 				.Where(s => !s.IsDeleted);
@@ -206,6 +208,8 @@ namespace Shipping.Repositories.UserService
 		public IEnumerable<Shipper> GetAllActive()
 		{
 			return context.Shippers.Include(s => s.User)
+				.Include(nv => nv.TinhThanh)
+				.Include(nv => nv.PhuongXa)
 				.Include(nv => nv.ChiNhanh).ThenInclude(c => c.TinhThanh)
 				.Include(nv => nv.ChiNhanh).ThenInclude(c => c.PhuongXa)
 				.Where(s => !s.IsDeleted && (s.User.LockoutEnd == null || s.User.LockoutEnd < DateTimeOffset.Now));
@@ -214,6 +218,8 @@ namespace Shipping.Repositories.UserService
 		public IEnumerable<Shipper> GetAllInactive()
 		{
 			return context.Shippers.Include(s => s.User)
+				.Include(nv => nv.TinhThanh)
+				.Include(nv => nv.PhuongXa)
 				.Include(nv => nv.ChiNhanh).ThenInclude(c => c.TinhThanh)
 				.Include(nv => nv.ChiNhanh).ThenInclude(c => c.PhuongXa)
 				.Where(s => !s.IsDeleted && (s.User.LockoutEnd != null || s.User.LockoutEnd >= DateTimeOffset.Now));
@@ -223,6 +229,8 @@ namespace Shipping.Repositories.UserService
 		{
 			if (id == null || id == 0) return null;
 			return await context.Shippers.Include(s => s.User)
+				.Include(nv => nv.TinhThanh)
+				.Include(nv => nv.PhuongXa)
 				.Include(nv => nv.ChiNhanh).ThenInclude(c => c.TinhThanh)
 				.Include(nv => nv.ChiNhanh).ThenInclude(c => c.PhuongXa)
 				.FirstOrDefaultAsync(s => s.Id == id && !s.IsDeleted);
@@ -238,6 +246,8 @@ namespace Shipping.Repositories.UserService
 			return await context.Shippers
 				.Include(s => s.User)
 				.Include(s => s.ChiNhanh)
+				.Include(nv => nv.TinhThanh)
+				.Include(nv => nv.PhuongXa)
 				.FirstOrDefaultAsync(s => s.UserId == userId && !s.IsDeleted);
 		}
 

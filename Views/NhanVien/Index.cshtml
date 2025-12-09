@@ -1,126 +1,105 @@
 ﻿@model IEnumerable<Shipping.Models.NhanVien>
 
 @{
-	ViewData["Title"] = "Quản lý nhân viên";
-	int index = 1;
+    ViewData["Title"] = "Quản lý nhân viên";
+    int index = 1;
 }
 
-<h1 class="text-center">Danh sách nhân viên</h1>
-
-<a asp-action="Create" class="btn btn-primary">Thêm nhân viên mới</a>
-
-<hr />
-
-<table class="table table-bordered table-striped table-hover">
-	<thead class="table-dark justify-content-center">
-		<tr class="text-center">
-			<th>
-				#
-			</th>
-			<th class="col-1">
-				Ảnh đại diện
-			</th>
-			<th class="col-2">
-				Họ tên
-			</th>
-			<th class="col-1">
-				CCCD
-			</th>
-			<th class="col-1">
-				SDT
-			</th>
-			<th class="col-1">
-				Chức vụ
-			</th>
-			<th class="col-3">
-				Chi nhánh
-			</th>
-			<th class="">
-				Tác vụ
-			</th>
-		</tr>
-	</thead>
-	<tbody>
-		@foreach (var item in Model)
-		{
-			<tr class="align-middle text-center">
-				<td>
-					<b>@(index++)</b>
-				</td>
-				<td>
-					@if (!string.IsNullOrEmpty(item.HinhAnh))
-					{
-						<img src="../images/avatar/nhanvien/@Html.DisplayFor(modelItem => item.HinhAnh)"
-							 alt="Ảnh đại diện"
-							 style="max-height: 100px; object-fit: cover;"
-							 class="avatar" />
-					}
-					else
-					{
-						<img src="../images/avatar/default_image.jpg"
-							 alt="Ảnh đại diện"
-							 style="max-height: 100px; object-fit: cover;"
-							 class="avatar" />
-					}
-				</td>
-				<td class="text-start">
-					@Html.DisplayFor(modelItem => item.Ten)
-				</td>
-				<td>
-					@Html.DisplayFor(modelItem => item.CCCD)
-				</td>
-				<td>
-					@Html.DisplayFor(modelItem => item.User.PhoneNumber)
-				</td>
-				<td>
-					@{
-						var roleConfirm = item.IsQuanLy ? "Bạn có chắc chắn muốn hạ quyền hạn của nhân viên này không?"
-						: "Bạn có chắc chắn muốn nâng quyền hạn của nhân viên này không?";
-						var roleBadge = item.IsQuanLy ? "btn btn-success" : "btn btn-warning text-dark";
-						var roleText = item.IsQuanLy ? "Quản lý" : "Nhân viên";
-					}
-					<form asp-action="ThayDoiQuyenHan" asp-route-id="@item.Id" method="post" class="d-inline"
-						  onsubmit="return confirm('@roleConfirm');">
-						<button class="badge @roleBadge">@roleText</button>
-					</form>
-				</td>
-				@if (item.ChiNhanh != null)
-				{
-					<td>
-						@Html.DisplayFor(modelItem => item.ChiNhanh.TenChiNhanh)
-					</td>
-				}
-				else
-				{
-					<td>Không thuộc chi nhánh nào</td>
-				}
-				<td>
-					<a class="btn btn-sm btn-outline-warning" asp-action="Edit" asp-route-id="@item.Id">Cập nhật</a> &nbsp;
-					<a class="btn btn-sm btn-outline-success" asp-action="Details" asp-route-id="@item.Id">Chi tiết</a> &nbsp;
-					<a class="btn btn-sm btn-outline-danger" asp-action="DeleteConfirm" asp-route-id="@item.Id"
-					   onclick="return confirm('Bạn có chắc chắn muốn xóa nhân viên này không?');">Xóa</a>
-				</td>
-			</tr>
-		}
-	</tbody>
-</table>
-
-@section Scripts {
-	<script>
-		document.addEventListener("DOMContentLoaded", function(){
-			var images = document.querySelectorAll('.avatar')
-			images.forEach(function(img)
-			{
-				var error_src = "../images/avatar/default_image.jpg";
-				img.onerror = function()
-				{
-					img.onerror = null;
-					if(error_src)
-					{
-						img.src = error_src;
-					}
-				};
-			});
-		});
-	</script>
-}
+<div class="container-fluid py-4">
+    <div class="card shadow border-0">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="m-0 fw-bold"><i class="fas fa-users-cog me-2"></i>Danh sách Nhân viên</h5>
+            <a asp-action="Create" class="btn btn-light text-primary fw-bold btn-sm shadow-sm">
+                <i class="fas fa-plus me-1"></i> Thêm nhân viên
+            </a>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-secondary">
+                        <tr class="text-center text-uppercase small fw-bold">
+                            <th style="width: 50px;">#</th>
+                            <th style="width: 80px;">Ảnh</th>
+                            <th class="text-start">Họ tên</th>
+                            <th>CCCD</th>
+                            <th>SĐT</th>
+                            <th>Chức vụ (Đổi)</th>
+                            <th>Chi nhánh</th>
+                            <th style="width: 150px;">Tác vụ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr class="text-center">
+                                <td class="text-muted">@(index++)</td>
+                                <td>
+                                    <div class="avatar-wrapper">
+                                        @if (!string.IsNullOrEmpty(item.HinhAnh))
+                                        {
+                                            <img src="/images/avatar/nhanvien/@Html.DisplayFor(modelItem => item.HinhAnh)"
+                                                 class="rounded-circle shadow-sm border"
+                                                 style="width: 50px; height: 50px; object-fit: cover;"
+                                                 alt="Avatar" />
+                                        }
+                                        else
+                                        {
+                                            <img src="/images/avatar/default_image.jpg"
+                                                 class="rounded-circle shadow-sm border"
+                                                 style="width: 50px; height: 50px; object-fit: cover;"
+                                                 alt="Default" />
+                                        }
+                                    </div>
+                                </td>
+                                <td class="text-start fw-bold text-primary">
+                                    @Html.DisplayFor(modelItem => item.Ten)
+                                </td>
+                                <td>@Html.DisplayFor(modelItem => item.CCCD)</td>
+                                <td>@Html.DisplayFor(modelItem => item.User.PhoneNumber)</td>
+                                <td>
+                                    @{
+                                        var roleConfirm = item.IsQuanLy ? "Bạn có muốn giáng chức xuống Nhân viên không?" : "Bạn có muốn thăng chức lên Quản lý không?";
+                                        var roleClass = item.IsQuanLy ? "btn-success" : "btn-warning text-dark";
+                                        var roleIcon = item.IsQuanLy ? "fa-user-shield" : "fa-user-tie";
+                                        var roleLabel = item.IsQuanLy ? "Quản lý" : "Nhân viên";
+                                    }
+                                    <form asp-action="ThayDoiQuyenHan" asp-route-id="@item.Id" method="post" class="d-inline"
+                                          onsubmit="return confirm('@roleConfirm');">
+                                        <button type="submit" class="btn btn-sm @roleClass rounded-pill fw-bold" style="min-width: 100px;">
+                                            <i class="fas @roleIcon me-1"></i> @roleLabel
+                                        </button>
+                                    </form>
+                                </td>
+                                <td class="small text-muted">
+                                    @if (item.ChiNhanh != null)
+                                    {
+                                        <i class="fas fa-building me-1"></i> 
+                                        @Html.DisplayFor(modelItem => item.ChiNhanh.TenChiNhanh)
+                                    }
+                                    else
+                                    {
+                                        <span class="text-danger fst-italic">Chưa phân công</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="Sửa">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info" title="Chi tiết">
+                                            <i class="fas fa-info-circle"></i>
+                                        </a>
+                                        <a asp-action="DeleteConfirm" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Xóa"
+                                           onclick="return confirm('Bạn có chắc chắn muốn xóa nhân viên @item.Ten không?');">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

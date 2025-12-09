@@ -1,52 +1,87 @@
 ﻿@model Shipping.Models.ChiNhanh
 
 @{
-    ViewData["Title"] = "Quản lý chi nhánh";
+    ViewData["Title"] = "Cập nhật chi nhánh";
 }
-<div class="row">
-    <div class="col-md-4 offset-md-4">
-        <h1 class="text-center">Cập nhật chi nhánh</h1>
-        <hr />
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="TenChiNhanh" class="control-label"></label>
-                <input asp-for="TenChiNhanh" class="form-control" />
-                <span asp-validation-for="TenChiNhanh" class="text-danger"></span>
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-warning text-dark py-3">
+                    <h4 class="mb-0 fw-bold text-center"><i class="fas fa-edit me-2"></i>Cập nhật Chi Nhánh</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger shadow-sm"></div>
+
+                        <h6 class="text-primary fw-bold text-uppercase border-bottom pb-2 mb-3">
+                            <i class="fas fa-info-circle me-1"></i> Thông tin chung
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="TenChiNhanh" class="form-control" placeholder="Tên chi nhánh" />
+                                    <label asp-for="TenChiNhanh"></label>
+                                    <span asp-validation-for="TenChiNhanh" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="SDT" class="form-control" placeholder="Số điện thoại" />
+                                    <label asp-for="SDT"></label>
+                                    <span asp-validation-for="SDT" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h6 class="text-primary fw-bold text-uppercase border-bottom pb-2 mb-3">
+                            <i class="fas fa-map-marked-alt me-1"></i> Địa chỉ
+                        </h6>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select asp-for="TinhThanhId" class="form-select">
+                                        <option value="">-- Chọn Tỉnh/Thành --</option>
+                                        @foreach (var t in (IEnumerable<TinhThanh>)ViewBag.TinhThanh)
+                                        {
+                                            <option value="@t.Id">@t.TenTinhThanh</option>
+                                        }
+                                    </select>
+                                    <label asp-for="TinhThanhId"></label>
+                                    <span asp-validation-for="TinhThanhId" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select asp-for="PhuongXaId" class="form-select">
+                                        <option value="">-- Chọn Phường/Xã --</option>
+                                    </select>
+                                    <label asp-for="PhuongXaId"></label>
+                                    <span asp-validation-for="PhuongXaId" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input asp-for="DiaChi" class="form-control" placeholder="Số nhà, đường..." />
+                                    <label asp-for="DiaChi"></label>
+                                    <span asp-validation-for="DiaChi" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Quay lại
+                            </a>
+                            <button type="submit" class="btn btn-success fw-bold px-4">
+                                <i class="fas fa-save me-1"></i> Lưu Chi Nhánh
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="SDT" class="control-label"></label>
-                <input asp-for="SDT" class="form-control" />
-                <span asp-validation-for="SDT" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TinhThanhId" class="control-label"></label>
-                <select asp-for="TinhThanhId" class="form-control" id="ddlTinhThanh" onchange="loadPhuongXa(this.value);">
-                    <option value="">-- Chọn Tỉnh/Thành phố --</option>
-                    @foreach (var t in (IEnumerable<TinhThanh>)ViewBag.TinhThanh)
-                    {
-                        <option value="@t.Id">@t.TenTinhThanh</option>
-                    }
-                </select>
-            </div>
-            <div class="form-group">
-                <label asp-for="PhuongXaId" class="control-label"></label>
-                <select asp-for="PhuongXaId" class="form-control" id="ddlPhuongXa">
-                    <option value="">-- Chọn Phường/Xã --</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label asp-for="DiaChi" class="control-label"></label>
-                <input asp-for="DiaChi" class="form-control" />
-                <span asp-validation-for="DiaChi" class="text-danger"></span>
-            </div>
-            <br />
-            <div class="form-group text-center">
-                <input type="submit" value="Lưu chi nhánh" class="btn btn-primary" /> &nbsp;
-                <a asp-action="Index" class="btn btn-outline-secondary">Trở về danh sách</a>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
@@ -54,37 +89,31 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
     <script>
-        var selectedMaPhuongXa = '@Model.PhuongXaId';
+        var selectedMaPhuongXa = '@Model?.PhuongXaId';
 
-        $(document).ready(function () {
-            var initialTinhThanh = $('#ddlTinhThanh').val();
-            if (initialTinhThanh) {
-                loadPhuongXa(initialTinhThanh);
-            }
+        $('#TinhThanhId').change(function () {
+            var tinhThanhId = $(this).val();
+            loadPhuongXa(tinhThanhId);
         });
 
         function loadPhuongXa(TinhThanhId) {
-            var ddlPhuongXa = $('#ddlPhuongXa');
-
-            ddlPhuongXa.empty();
-            ddlPhuongXa.append('<option value="">-- Đang tải... --</option>');
+            var ddlPhuongXa = $('#PhuongXaId');
+            ddlPhuongXa.empty().append('<option value="">-- Đang tải... --</option>');
 
             if (!TinhThanhId) {
-                ddlPhuongXa.empty();
-                ddlPhuongXa.append('<option value="">-- Chọn Phường/Xã --</option>');
+                ddlPhuongXa.empty().append('<option value="">-- Chọn Phường/Xã --</option>');
                 return;
             }
+
             $.ajax({
                 type: 'GET',
-                url: '@Url.Action("GetPhuongXaByTinhThanh", "ChiNhanh")',
+                url: '@Url.Action("GetPhuongXaByTinhThanh", "Address")',
                 data: { TinhThanhId: TinhThanhId },
                 success: function (data) {
-                    ddlPhuongXa.empty();
-                    ddlPhuongXa.append('<option value="">-- Chọn Phường/Xã --</option>');
+                    ddlPhuongXa.empty().append('<option value="">-- Chọn Phường/Xã --</option>');
                     $.each(data, function (index, item) {
-                        ddlPhuongXa.append($('<option></option>').val(item.value).text(item.text));
+                        ddlPhuongXa.append($('<option></option>').val(item.id).text(item.name));
                     });
                     if (selectedMaPhuongXa) {
                         ddlPhuongXa.val(selectedMaPhuongXa);
@@ -92,11 +121,13 @@
                     }
                 },
                 error: function (xhr, status, error) {
-                    console.error("Lỗi khi tải Phường Xã:", error);
-                    ddlPhuongXa.empty();
-                    ddlPhuongXa.append('<option value="">-- Lỗi tải dữ liệu --</option>');
+                    console.error("Lỗi:", error);
+                    ddlPhuongXa.empty().append('<option value="">Lỗi tải dữ liệu</option>');
                 }
             });
         }
+
+        var initialTinh = $('#TinhThanhId').val();
+        if (initialTinh) loadPhuongXa(initialTinh);
     </script>
 }

@@ -36,6 +36,7 @@ namespace Shipping.Repositories.DonHangService
 			decimal volWeight = (L * W * H) / dimenDivider;
 			model.TrongLuongQD = volWeight;
 			decimal chargeWeight = Math.Max(model.TrongLuongThuc, volWeight);
+			Console.WriteLine("chargeW: " + chargeWeight);
 
 			if (volWeight > model.TrongLuongThuc)
 			{
@@ -60,12 +61,13 @@ namespace Shipping.Repositories.DonHangService
 				{
 					decimal stepUnit = dichVu.DonViTangThem;
 					decimal thresholdWeight = dichVu.MocCanNang;
+					Console.WriteLine("thresholdW: " + thresholdWeight);
 
 					// Tính số nấc (Luôn làm tròn lên)
 					int totalSteps = (int)Math.Ceiling(chargeWeight / stepUnit);
 					int thresholdSteps = (int)Math.Ceiling(thresholdWeight / stepUnit) - 1;
 
-					if (chargeWeight <= thresholdWeight)
+					if (chargeWeight < thresholdWeight)
 					{
 						// Dưới Mốc: Base + (Số nấc * Giá tăng thêm)
 						decimal phiTangThem = totalSteps * cauTruc.GiaTangThem;

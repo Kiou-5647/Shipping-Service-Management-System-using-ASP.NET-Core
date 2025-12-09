@@ -5,55 +5,62 @@
     int index = 1;
 }
 
-<h1>Danh sách chi nhánh</h1>
-
-<p>
-    <a class="btn btn-primary" asp-action="Create">Thêm chi nhánh</a>
-</p>
-<hr />
-<table class="table table-bordered">
-    <thead class="table-dark justify-content-center">
-        <tr class="text-center">
-            <th>
-                #
-            </th>
-            <th>
-                Tên chi nhánh
-            </th>
-            <th>
-                Số điện thoại
-            </th>
-            <th>
-                Địa chỉ chi nhánh
-            </th>
-            <th>
-                Tác vụ
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr class="align-middle">
-                <td>
-                    <b>@(index++)</b>
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.TenChiNhanh)
-                </td>
-                <td class="text-center">
-                    @Html.DisplayFor(modelItem => item.SDT)
-                </td>
-                <td>
-                    @item.DiaChi, @item.PhuongXa.TenPhuongXa, @item.TinhThanh.TenTinhThanh
-                </td>
-                <td class="text-center">
-                    <a class="btn btn-outline-warning" asp-action="Edit" asp-route-id="@item.Id">Cập nhật</a> &nbsp;
-                    <a class="btn btn-outline-success" asp-action="Details" asp-route-id="@item.Id">Chi tiết</a> &nbsp;
-                    <a class="btn btn-outline-danger" asp-action="Delete" asp-route-id="@item.Id"
-                       onclick="return confirm('Bạn có chắc chắn muốn xóa chi nhánh này không?');">Xóa</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="container-fluid py-4">
+    <div class="card shadow border-0">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="m-0 fw-bold"><i class="fas fa-building me-2"></i>Danh sách Chi Nhánh</h5>
+            <a asp-action="Create" class="btn btn-light text-primary fw-bold btn-sm shadow-sm">
+                <i class="fas fa-plus me-1"></i> Thêm chi nhánh
+            </a>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-secondary">
+                        <tr class="text-center text-uppercase small fw-bold">
+                            <th style="width: 50px;">#</th>
+                            <th class="text-start" style="width: 25%;">Tên chi nhánh</th>
+                            <th style="width: 15%;">Số điện thoại</th>
+                            <th class="text-start">Địa chỉ chi tiết</th>
+                            <th style="width: 150px;">Tác vụ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr class="text-center">
+                                <td class="text-muted">@(index++)</td>
+                                <td class="text-start">
+                                    <div class="fw-bold text-primary">@Html.DisplayFor(modelItem => item.TenChiNhanh)</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="fas fa-phone me-1 text-success"></i> @Html.DisplayFor(modelItem => item.SDT)
+                                    </span>
+                                </td>
+                                <td class="text-start small text-muted">
+                                    <i class="fas fa-map-marker-alt me-1 text-danger"></i>
+                                    @item.DiaChi, @item.PhuongXa.TenPhuongXa, @item.TinhThanh.TenTinhThanh
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning" title="Sửa">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info" title="Chi tiết">
+                                            <i class="fas fa-info-circle"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Xóa"
+                                           onclick="return confirm('Bạn có chắc chắn muốn xóa chi nhánh @item.TenChiNhanh không?');">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Shipping.Models;
 using Shipping.Repositories.ConfigService;
 using Shipping.Repositories.CrudService;
@@ -6,7 +7,8 @@ using Shipping.Repositories.CrudService;
 
 namespace Shipping.Controllers
 {
-    public class LoaiDichVuController : Controller
+	[Authorize(Roles = "Admin")]
+	public class LoaiDichVuController : Controller
     {
 		private readonly ICrudService<LoaiDichVu> _loaiDichVuRepo;
 		private readonly ICrudService<CauTrucGiaCuoc> _giaCuocRepo;
@@ -22,13 +24,14 @@ namespace Shipping.Controllers
 		}
 
 		// GET: LoaiDichVu
+		[AllowAnonymous]
 		public IActionResult Index()
 		{
 			var dv = _loaiDichVuRepo.GetAll();
 			return View(dv);
 		}
 
-		// GET: LoaiDichVu/Details/5
+		[AllowAnonymous]
 		public async Task<IActionResult> Details(int? id)
 		{
 			var dv = await _loaiDichVuRepo.GetById(id);
@@ -74,7 +77,7 @@ namespace Shipping.Controllers
 
 				if (successDv.Completed)
 				{
-					return RedirectToAction(nameof(Index));
+					return RedirectToAction(nameof(Details), new {id = loaiDichVu.Id});
 				}
 				ModelState.AddModelError(string.Empty, successDv.Message);
 			}

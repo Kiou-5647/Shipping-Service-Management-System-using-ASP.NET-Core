@@ -61,6 +61,11 @@ builder.Services.ConfigureApplicationCookie(options => {
 	options.AccessDeniedPath = "/Identity/Account/AccessDenied";
 });
 
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+{
+	options.ValidationInterval = TimeSpan.FromMinutes(0);
+});
+
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();

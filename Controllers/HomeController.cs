@@ -19,13 +19,17 @@ namespace Shipping.Controllers
 			{
 				return RedirectToAction("Dashboard", "Shipper");
 			}
-			if (User.IsInRole("KhachHang"))
+			else if (User.IsInRole("KhachHang"))
 			{
 				return RedirectToAction("MyOrders", "DonHang");
 			}
-
-			var vm = await _dashboardService.GetDashboardData();
-			return View(vm);
+			else if (User.IsInRole("Admin") || User.IsInRole("NhanVien"))
+			{
+				var vm = await _dashboardService.GetDashboardData();
+				return View(vm);
+			}
+			else
+				return RedirectToAction("Index", "Tracking");
 		}
 	}
 }

@@ -2,97 +2,129 @@
 @model Shipping.ViewModels.ConfigListViewModel
 
 @{
-    ViewData["Title"] = "Quản lý Cấu hình Hệ thống";
+    ViewData["Title"] = "Cấu hình hệ thống";
 }
 
-<h1 class="text-center">@ViewData["Title"]</h1>
-<br/>
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-
-<form asp-action="Index" method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-    <table class="table table-bordered table-striped table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Tên cấu hình</th>
-                <th>Giá trị</th>
-                <th>Mô tả</th>
-                <th>Áp dụng</th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (int i = 0; i < Model.Configs.Count; i++)
+            @if (TempData["SuccessMessage"] != null)
             {
-                var config = Model.Configs[i];
-                <tr>
-                    <td>
-                        <input type="hidden" asp-for="Configs[i].Id" />
-                        <input type="hidden" asp-for="Configs[i].Ten" />
-                        <input type="hidden" asp-for="Configs[i].Loai" />
-                        <input type="hidden" asp-for="Configs[i].LoaiGiaTri" />
-                        <input type="hidden" asp-for="Configs[i].MoTa" />
-
-                        <strong>@config.Ten</strong>
-                        <br />
-                        <small class="text-muted">(@config.Id)</small>
-                    </td>
-                    <td>
-                        <div class="input-group">
-                            <input asp-for="Configs[i].GiaTri" value="@config.GiaTri.ToString("N")" class="form-control" />
-                            @if(config.LoaiGiaTri != LoaiGiaTri.None)
-                            {
-                                <span class="input-group-text">
-                                    @if (config.LoaiGiaTri == LoaiGiaTri.Percent)
-                                    {
-                                        <span>%</span>
-                                    }
-                                    else if (config.LoaiGiaTri == LoaiGiaTri.Fixed)
-                                    {
-                                        <span>VND</span>
-                                    }
-                                </span>
-                            }
-                        </div>
-                        <span asp-validation-for="Configs[i].GiaTri" class="text-danger"></span>
-                    </td>
-                    <td>
-                        <p class="mb-0 text-wrap"><small>@config.MoTa</small></p>
-                    </td>
-                    <td class="align-middle">
-                        @if (config.Loai == LoaiConfig.LuaChon)
-                        {
-                            <span class="badge bg-primary">Lựa chọn</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-secondary">Tự động</span>
-                        }
-                    </td>
-                </tr>
+                <div class="alert alert-success alert-dismissible fade show shadow-sm border-0" role="alert">
+                    <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             }
-        </tbody>
-    </table>
 
-    <div class="row mt-4">
-        <div class="col-12 text-end">
-            <button type="submit" class="btn btn-primary btn-lg">
-                <i class="bi bi-save"></i> Lưu Cấu hình
-            </button>
+            <form asp-action="Index" method="post">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="m-0 fw-bold text-uppercase">
+                            <i class="fas fa-cogs me-2"></i> Tham số cấu hình hệ thống
+                        </h5>
+                        <button type="submit" class="btn btn-light text-primary fw-bold btn-sm shadow-sm">
+                            <i class="fas fa-save me-1"></i> Lưu thay đổi
+                        </button>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div asp-validation-summary="ModelOnly" class="text-danger p-3"></div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light text-secondary">
+                                    <tr class="text-uppercase small fw-bold">
+                                        <th class="ps-4 py-3" style="width: 25%">Tên cấu hình</th>
+                                        <th style="width: 30%">Giá trị thiết lập</th>
+                                        <th style="width: 30%">Mô tả chi tiết</th>
+                                        <th class="text-center" style="width: 15%">Loại</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < Model.Configs.Count; i++)
+                                    {
+                                        var config = Model.Configs[i];
+                                        bool isAuto = config.Loai == LoaiConfig.TuDong;
+                                        string rowClass = isAuto ? "bg-light" : ""; // Làm mờ dòng tự động
+
+                                        <tr class="@rowClass">
+                                            <td class="ps-4">
+                                                <input type="hidden" asp-for="Configs[i].Id" />
+                                                <input type="hidden" asp-for="Configs[i].Ten" />
+                                                <input type="hidden" asp-for="Configs[i].Loai" />
+                                                <input type="hidden" asp-for="Configs[i].LoaiGiaTri" />
+                                                <input type="hidden" asp-for="Configs[i].MoTa" />
+
+                                                <div class="fw-bold text-dark">@config.Ten</div>
+                                                <small class="text-muted fst-italic">ID: @config.Id</small>
+                                            </td>
+
+                                            <td>
+                                                <div class="input-group input-group-sm">
+                                                    <input asp-for="Configs[i].GiaTri" class="form-control fw-bold text-primary" />
+
+                                                    @if (config.LoaiGiaTri == LoaiGiaTri.Percent)
+                                                    {
+                                                        <span class="input-group-text bg-white text-muted">%</span>
+                                                    }
+                                                    else if (config.LoaiGiaTri == LoaiGiaTri.Mass)
+                                                    {
+                                                        <span class="input-group-text bg-white text-muted">kg</span>
+                                                    }
+                                                    else if (config.LoaiGiaTri == LoaiGiaTri.Fixed)
+                                                    {
+                                                        <span class="input-group-text bg-white text-muted">VNĐ</span>
+                                                    }
+                                                    else if (config.LoaiGiaTri == LoaiGiaTri.None)
+                                                    {
+                                                        <span class="input-group-text bg-white text-muted">#</span>
+                                                    }
+                                                </div>
+                                                <span asp-validation-for="Configs[i].GiaTri" class="text-danger small"></span>
+                                            </td>
+
+                                            <td>
+                                                <span class="text-muted small">
+                                                    <i class="fas fa-info-circle me-1 text-info"></i>
+                                                    @config.MoTa
+                                                </span>
+                                            </td>
+
+                                            <td class="text-center">
+                                                @if (isAuto)
+                                                {
+                                                    <span class="badge bg-secondary rounded-pill">
+                                                        <i class="fas fa-robot me-1"></i> Tự động
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success rounded-pill">
+                                                        <i class="fas fa-edit me-1"></i> Tùy chỉnh
+                                                    </span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-light py-3 text-end">
+                        <button type="submit" class="btn btn-primary fw-bold px-4 shadow-sm">
+                            <i class="fas fa-save me-2"></i> Lưu Cấu hình
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
-</form>
+</div>
 
 @section Scripts {
     @{
-        // Đảm bảo Validation Scripts được render
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }

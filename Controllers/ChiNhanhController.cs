@@ -148,19 +148,5 @@ namespace Shipping.Controllers
 			}
 			return RedirectToAction(nameof(Index));
 		}
-
-		[HttpGet]
-		public IActionResult GetPhuongXaByTinhThanh(string TinhThanhId)
-		{
-			var phuongXaList = phuongXaRepo.GetAll()
-									   .Where(px => px.TinhThanhId == TinhThanhId)
-									   .Select(px => new {
-										   value = px.Id,
-										   text = px.TenPhuongXa
-									   })
-									   .ToList();
-
-			return Json(phuongXaList);
-		}
 	}
 }
