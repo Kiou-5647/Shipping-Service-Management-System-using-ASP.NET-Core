@@ -308,10 +308,10 @@ namespace Shipping.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("HinhAnhGiaoHang")
+                    b.Property<string>("GhiChu")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("HinhAnhNhanHang")
+                    b.Property<string>("HinhAnhGiaoHang")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("NgayHoanThanh")
@@ -452,9 +452,6 @@ namespace Shipping.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(10)");
 
-                    b.Property<int?>("ShipperId")
-                        .HasColumnType("int");
-
                     b.Property<string>("TTNguoiGui")
                         .HasColumnType("nvarchar(max)");
 
@@ -487,9 +484,6 @@ namespace Shipping.Migrations
                     b.Property<decimal>("TrongLuongThuc")
                         .HasColumnType("decimal(12, 2)");
 
-                    b.Property<string>("ViTri")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("KhachHangId");
@@ -501,8 +495,6 @@ namespace Shipping.Migrations
                     b.HasIndex("PhuongGuiId");
 
                     b.HasIndex("PhuongNhanId");
-
-                    b.HasIndex("ShipperId");
 
                     b.HasIndex("TinhGuiId");
 
@@ -985,11 +977,6 @@ namespace Shipping.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Shipping.Models.Shipper", "Shipper")
-                        .WithMany("DonHangs")
-                        .HasForeignKey("ShipperId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Shipping.Models.TinhThanh", "TinhThanhGui")
                         .WithMany("GuiDonHangs")
                         .HasForeignKey("TinhGuiId")
@@ -1011,8 +998,6 @@ namespace Shipping.Migrations
                     b.Navigation("PhuongXaGui");
 
                     b.Navigation("PhuongXaNhan");
-
-                    b.Navigation("Shipper");
 
                     b.Navigation("TinhThanhGui");
 
@@ -1187,8 +1172,6 @@ namespace Shipping.Migrations
             modelBuilder.Entity("Shipping.Models.Shipper", b =>
                 {
                     b.Navigation("ChuyenHangs");
-
-                    b.Navigation("DonHangs");
                 });
 
             modelBuilder.Entity("Shipping.Models.TinhThanh", b =>

@@ -327,7 +327,7 @@
                                                             _ => "bg-secondary"
                                                         };
                                                     }
-                                                    <span class="badge @badgeColor rounded-pill" style="font-size: 0.7rem;">@chuyen.TrangThai</span>
+                                                    <span class="badge @badgeColor rounded-pill" style="font-size: 0.7rem;">@Html.DisplayFor(Model => chuyen.TrangThai)</span>
 
                                                     @if (!string.IsNullOrEmpty(chuyen.HinhAnhGiaoHang))
                                                     {
@@ -464,7 +464,7 @@
                         <form asp-action="ConfirmPayment" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label class="form-label small fw-bold">Tải lên bằng chứng (UNC/Tiền mặt):</label>
-                                <input type="file" name="evidenceFile" id="paymentFile" class="form-control form-control-sm" accept="image/*" />
+                                <input type="file" name="file" id="file" class="form-control form-control-sm" accept="image/*" />
                                 <div id="paymentPreviewBox" class="d-none mt-2 text-center border p-1 bg-light">
                                     <img id="paymentPreviewImg" src="#" style="max-height: 100px;" />
                                 </div>
@@ -668,15 +668,12 @@
 
             // Logic xác định ID Tỉnh
             if (srcType === "1") {
-                // Đơn gốc -> Lấy ID tỉnh gốc
                 fetchShippers($('#originTinhId').val());
             }
             else if (srcType === "5") {
-                // Nhập tay -> Lấy từ dropdown Tỉnh nhập tay
                 fetchShippers($('#srcManualTinhId').val());
             }
             else if (srcType === "3") {
-                // Chi nhánh -> Gọi API giải mã Tỉnh của chi nhánh
                 var cnId = $('#srcBranchSelect').val();
                 if(cnId) {
                     $.getJSON('/Shipper/ResolveLocation', { type: 3, dataId: cnId }, function(res) {
@@ -687,14 +684,12 @@
                 }
             }
             else if (srcType === "4") {
-                // Tiếp nối -> Gọi API giải mã điểm đến chuyến trước
                 var orderId = '@Model.Id';
                 $.getJSON('/Shipper/ResolveLocation', { type: 4, orderId: orderId }, function(res) {
                     fetchShippers(res.locationId);
                 });
             }
         }
-
 
 
         $(document).ready(function() {
@@ -704,7 +699,6 @@
                 loadShippers();
             });
 
-            // Logic xem ảnh preview thanh toán (Code cũ của bạn)
             $("#paymentFile").change(function(e) {
                 var file = e.target.files[0];
                 if (file) {

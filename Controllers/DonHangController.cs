@@ -182,11 +182,7 @@ namespace Shipping.Controllers
 			var allNhanViens = _nhanVienRepo.GetAll();
 			var nhanVien = allNhanViens.FirstOrDefault(nv => nv.UserId == userId);
 
-			var allShippers = _shipperRepo.GetAll();
-			var shipper = allShippers.FirstOrDefault(s => s.UserId == userId);
-
 			int? nvId = nhanVien?.Id;
-			int? shipperId = shipper?.Id;
 
 			string? paymentImgPath = null;
 			if (file != null)
@@ -195,7 +191,7 @@ namespace Shipping.Controllers
 				paymentImgPath = Image.Upload(file, folderName);
 			}
 
-			var result = await _donHangRepo.UpdatePaymentStatus(id, true, paymentImage: paymentImgPath, nhanVienId: nvId, shipperId: shipperId);
+			var result = await _donHangRepo.UpdatePaymentStatus(id, true, paymentImage: paymentImgPath, nhanVienId: nvId);
 
 			if (result.Completed) TempData["Success"] = result.Message;
 			else TempData["Error"] = result.Message;

@@ -51,10 +51,24 @@ namespace Shipping.Controllers
 
 		// GET: Shipper
 		[Authorize(Roles = "Admin")]
-		public async Task<IActionResult> Index()
+		public IActionResult Index(string searchString)
         {
-			GetData();
+			ViewBag.Search = searchString;
 			var shipper = _shipperRepo.GetAllActive();
+
+			if (!string.IsNullOrEmpty(searchString))
+			{
+				searchString = searchString.ToLower();
+
+				shipper = shipper.Where(s =>
+					s.Ten.ToLower().Contains(searchString) ||
+					s.User.PhoneNumber.Contains(searchString) ||
+					s.User.Email.ToLower().Contains(searchString) ||
+					s.BienSoXe.ToLower().Contains(searchString)
+				);
+			}
+
+			GetData();
 			return View(shipper);
 		}
 

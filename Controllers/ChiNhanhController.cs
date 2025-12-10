@@ -37,10 +37,23 @@ namespace Shipping.Controllers
 		}
 
 		// GET: ChiNhanh
-		public IActionResult Index()
+		public IActionResult Index(string searchString)
 		{
-			GetData();
+			ViewBag.Search = searchString;
 			var chiNhanh = chiNhanhRepo.GetAll();
+
+			if (!string.IsNullOrEmpty(searchString))
+			{
+				searchString = searchString.ToLower();
+
+				chiNhanh = chiNhanh.Where(s =>
+					s.TenChiNhanh.ToLower().Contains(searchString) ||
+					s.SDT.Contains(searchString) ||
+					s.DiaChi.ToLower().Contains(searchString)
+				);
+			}
+
+			GetData();
 			return View(chiNhanh);
 		}
 

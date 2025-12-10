@@ -42,9 +42,22 @@ namespace Shipping.Controllers
 		}
 
 		// GET: NhanVien
-		public IActionResult Index()
+		public IActionResult Index(string searchString)
         {
+			ViewBag.Search = searchString;
 			var nhanViens = _nhanVienRepo.GetAll();
+
+			if (!string.IsNullOrEmpty(searchString))
+			{
+				searchString = searchString.ToLower();
+
+				nhanViens = nhanViens.Where(s =>
+					s.Ten.ToLower().Contains(searchString) ||
+					s.User.PhoneNumber.Contains(searchString) ||
+					s.CCCD.Contains(searchString) ||
+					s.User.Email.ToLower().Contains(searchString)
+				);
+			}
 			return View(nhanViens);
 		}
 

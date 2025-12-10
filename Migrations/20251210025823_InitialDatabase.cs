@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Shipping.Migrations
 {
     /// <inheritdoc />
-    public partial class CSDL : Migration
+    public partial class InitialDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -463,10 +463,8 @@ namespace Shipping.Migrations
                     HinhAnhGoiHang = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     HinhAnhXacNhan = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     GhiChu = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ViTri = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     KhachHangId = table.Column<int>(type: "int", nullable: true),
                     NhanVienId = table.Column<int>(type: "int", nullable: true),
-                    ShipperId = table.Column<int>(type: "int", nullable: true),
                     LoaiDichVuId = table.Column<int>(type: "int", nullable: false),
                     TinhGuiId = table.Column<string>(type: "nvarchar(10)", nullable: false),
                     PhuongGuiId = table.Column<string>(type: "nvarchar(10)", nullable: false),
@@ -507,12 +505,6 @@ namespace Shipping.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_DonHangs_Shippers_ShipperId",
-                        column: x => x.ShipperId,
-                        principalTable: "Shippers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
                         name: "FK_DonHangs_TinhThanhs_TinhGuiId",
                         column: x => x.TinhGuiId,
                         principalTable: "TinhThanhs",
@@ -537,9 +529,9 @@ namespace Shipping.Migrations
                     TrangThai = table.Column<int>(type: "int", nullable: false),
                     DiaChiGui = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DiaChiNhan = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    HinhAnhNhanHang = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     HinhAnhGiaoHang = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ViTri = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    GhiChu = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ShipperId = table.Column<int>(type: "int", nullable: true),
                     TinhGuiId = table.Column<string>(type: "nvarchar(10)", nullable: false),
                     PhuongGuiId = table.Column<string>(type: "nvarchar(10)", nullable: false),
@@ -692,11 +684,6 @@ namespace Shipping.Migrations
                 column: "PhuongNhanId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DonHangs_ShipperId",
-                table: "DonHangs",
-                column: "ShipperId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_DonHangs_TinhGuiId",
                 table: "DonHangs",
                 column: "TinhGuiId");
@@ -831,6 +818,9 @@ namespace Shipping.Migrations
                 name: "DonHangs");
 
             migrationBuilder.DropTable(
+                name: "Shippers");
+
+            migrationBuilder.DropTable(
                 name: "KhachHangs");
 
             migrationBuilder.DropTable(
@@ -838,9 +828,6 @@ namespace Shipping.Migrations
 
             migrationBuilder.DropTable(
                 name: "NhanViens");
-
-            migrationBuilder.DropTable(
-                name: "Shippers");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

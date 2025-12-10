@@ -38,10 +38,29 @@ namespace Shipping.Controllers
 		}
 
 		// GET: KhachHang
-		public IActionResult Index()
+		public IActionResult Index(string searchString)
 		{
-			GetData();
+			ViewBag.Search = searchString;
 			var khachHang = _khachHangRepo.GetAll();
+
+			if (!string.IsNullOrEmpty(searchString))
+			{
+				searchString = searchString.ToLower();
+
+				khachHang = khachHang.Where(k =>
+					(k.Ten != null && k.Ten.ToLower().Contains(searchString)) ||
+
+					(k.User != null && k.User.PhoneNumber != null && k.User.PhoneNumber.Contains(searchString)) ||
+
+					(k.User != null && k.User.Email != null && k.User.Email.ToLower().Contains(searchString)) ||
+
+					(k.MaSoThue != null && k.MaSoThue.Contains(searchString)) ||
+
+					(k.CCCD != null && k.CCCD.Contains(searchString))
+				);
+			}
+
+			GetData();
 			return View(khachHang);
 		}
 

@@ -111,9 +111,6 @@ namespace Shipping.Models
 		[Column(TypeName = "nvarchar(max)")]
 		public string? GhiChu { get; set; }
 
-		[Column(TypeName = "nvarchar(max)")]
-		public string? ViTri { get; set; }
-
 
 		//Foreign Key
 		[ForeignKey("KhachHang")]
@@ -127,12 +124,6 @@ namespace Shipping.Models
 		public int? NhanVienId { get; set; }
 		[ValidateNever]
 		public virtual NhanVien? NhanVien { get; set; }
-
-		[ForeignKey("Shipper")]
-		[DisplayName("Nhân viên thanh toán")]
-		public int? ShipperId { get; set; }
-		[ValidateNever]
-		public virtual Shipper? Shipper { get; set; }
 
 		[Required]
 		[ForeignKey("LoaiDichVu")]

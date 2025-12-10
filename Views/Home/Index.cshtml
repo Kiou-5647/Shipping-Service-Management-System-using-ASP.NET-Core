@@ -147,7 +147,7 @@
                                             _ => "bg-secondary"
                                         };
                                     }
-                                    <span class="badge @badge">@item.TrangThaiDH</span>
+                                    <span class="badge @badge">@Html.DisplayFor(Model => item.TrangThaiDH)</span>
                                 </td>
                                 <td class="text-end pe-3">
                                     <a asp-controller="DonHang" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">

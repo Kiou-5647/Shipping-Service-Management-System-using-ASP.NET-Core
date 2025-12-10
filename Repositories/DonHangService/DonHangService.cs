@@ -287,7 +287,6 @@ namespace Shipping.Repositories.DonHangService
 				.Include(d => d.PhuongXaGui)
 				.Include(d => d.PhuongXaNhan)
 				.Include(d => d.KhachHang)
-				.Include(d => d.Shipper)
 				.Include(d => d.NhanVien)
 				.OrderByDescending(d => d.NgayTao);
 		}
@@ -300,7 +299,6 @@ namespace Shipping.Repositories.DonHangService
 				.Include(d => d.PhuongXaGui)
 				.Include(d => d.PhuongXaNhan)
 				.Include(d => d.KhachHang)
-				.Include(d => d.Shipper)
 				.Include(d => d.NhanVien)
 				.OrderByDescending(d => d.NgayTao)
 				.FirstOrDefaultAsync(d => d.Id == id);
@@ -316,7 +314,7 @@ namespace Shipping.Repositories.DonHangService
 				.OrderByDescending(d => d.NgayTao).ToListAsync();
 		}
 
-		public async Task<ReturnState> UpdatePaymentStatus(string id, bool daThanhToan, string? paymentImage = null, int? nhanVienId = null, int? shipperId = null)
+		public async Task<ReturnState> UpdatePaymentStatus(string id, bool daThanhToan, string? paymentImage = null, int? nhanVienId = null)
 		{
 			try
 			{
@@ -337,18 +335,11 @@ namespace Shipping.Repositories.DonHangService
 					if (nhanVienId.HasValue)
 					{
 						order.NhanVienId = nhanVienId.Value;
-						order.ShipperId = null;
-					}
-					else if (shipperId.HasValue)
-					{
-						order.ShipperId = shipperId.Value;
-						order.NhanVienId = null;
 					}
 				}
 				else
 				{
 					order.NhanVienId = null;
-					order.ShipperId = null;
 					order.HinhAnhXacNhan = null;
 				}
 

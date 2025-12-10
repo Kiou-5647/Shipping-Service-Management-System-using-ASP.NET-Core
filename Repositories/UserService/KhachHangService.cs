@@ -31,12 +31,12 @@ namespace Shipping.Repositories.UserService
 				return new ReturnState() { Completed = false, Message = "Email đã được sử dụng!" };
 			}
 
-			if (await context.KhachHangs.AnyAsync(kh => kh.CCCD == model.CCCD))
+			if (model.CCCD != null && await context.KhachHangs.AnyAsync(kh => kh.CCCD == model.CCCD))
 			{
 				return new ReturnState() { Completed = false, Message = "Căn cước công dân đã được sử dụng!" };
 			}
 
-			if (await context.KhachHangs.AnyAsync(k => k.MaSoThue == model.MaSoThue))
+			if (model.MaSoThue != null && await context.KhachHangs.AnyAsync(k => k.MaSoThue == model.MaSoThue))
 			{
 				return new ReturnState() { Completed = false, Message = "Mã số thuế đã được sử dụng!" };
 			}

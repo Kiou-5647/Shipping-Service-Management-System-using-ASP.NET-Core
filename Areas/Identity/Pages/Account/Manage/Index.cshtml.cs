@@ -293,7 +293,7 @@ namespace Shipping.Areas.Identity.Pages.Account.Manage
 					DiaChi = Input.DiaChi,
 					TinhThanhId = Input.TinhThanhId,
 					PhuongXaId = Input.PhuongXaId,
-
+					IsQuanLy = User.IsInRole("Admin") ? true : false,
 					NgaySinh = Input.NgaySinh ?? DateTime.Now,
 					GioiTinh = Input.GioiTinh ?? true,
 					HinhAnh = newAvatarPath

@@ -436,6 +436,48 @@ namespace Shipping.Repositories.DonHangService
 					}
 				}
 			}
+			else if (trangThai == TrangThaiDonHang.ThatBai)
+			{
+				var donHang = await _context.DonHangs.FindAsync(donHangId);
+				if (donHang != null)
+				{
+					donHang.TrangThaiDH = TrangThaiDonHang.ThatBai;
+					donHang.NgayCapNhat = DateTime.Now;
+					var index = thuTu + 1;
+					while (true)
+					{
+						var chuyenToCancel = await _context.ChuyenHangs.FindAsync(donHangId, index);
+						if (chuyenToCancel != null)
+						{
+							chuyenToCancel.TrangThai = TrangThaiDonHang.ThatBai;
+							index++;
+						}
+						else
+							break;
+					}
+				}
+			}
+			else if (trangThai == TrangThaiDonHang.DangGiao)
+			{
+				var donHang = await _context.DonHangs.FindAsync(donHangId);
+				if (donHang != null)
+				{
+					donHang.TrangThaiDH = TrangThaiDonHang.DangGiao;
+					donHang.NgayCapNhat = DateTime.Now;
+					var index = thuTu + 1;
+					while (true)
+					{
+						var chuyenToCancel = await _context.ChuyenHangs.FindAsync(donHangId, index);
+						if (chuyenToCancel != null)
+						{
+							chuyenToCancel.TrangThai = TrangThaiDonHang.DangGiao;
+							index++;
+						}
+						else
+							break;
+					}
+				}
+			}
 
 			await _context.SaveChangesAsync();
 			return new ReturnState { Completed = true, Message = "Cập nhật thành công." };

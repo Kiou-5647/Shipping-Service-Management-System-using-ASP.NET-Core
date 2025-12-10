@@ -91,6 +91,5 @@ namespace Shipping.Models
 
 		//Navigation
 		public virtual ICollection<ChuyenHang> ChuyenHangs { get; set; } = null!;
-		public virtual ICollection<DonHang> DonHangs { get; set; } = null!;
 	}
 }

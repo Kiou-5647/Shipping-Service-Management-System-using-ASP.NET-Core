@@ -180,13 +180,6 @@ namespace Shipping.Data
 				.IsRequired(false)
 				.OnDelete(DeleteBehavior.Restrict);
 
-			modelBuilder.Entity<DonHang>()
-				.HasOne(d => d.Shipper)
-				.WithMany(n => n.DonHangs)
-				.HasForeignKey(d => d.ShipperId)
-				.IsRequired(false)
-				.OnDelete(DeleteBehavior.Restrict);
-
 			modelBuilder.Entity<ChuyenHang>()
 				.HasOne(c => c.DonHang)
 				.WithMany(d => d.ChuyenHangs)

@@ -39,10 +39,6 @@ namespace Shipping.Models
 		[Column(TypeName = "nvarchar(max)")]
 		public string DiaChiNhan { get; set; } = null!;
 
-		[DisplayName("Hình ảnh nhận hàng")]
-		[Column(TypeName = "nvarchar(max)")]
-		public string? HinhAnhNhanHang { get; set; } = null!;
-
 		[DisplayName("Hình ảnh giao hàng")]
 		[Column(TypeName = "nvarchar(max)")]
 		public string? HinhAnhGiaoHang { get; set; } = null!;

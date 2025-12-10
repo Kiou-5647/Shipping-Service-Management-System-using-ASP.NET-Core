@@ -398,7 +398,7 @@ namespace Shipping.Data.Seed
 						MaDV = "STD",
 						DonViTangThem = 0.5M,
 						MocCanNang = 3,
-						ThoiGianToiThieu = 2,
+						ThoiGianToiThieu = 1,
 						ThoiGianToiDa = 5,
 						MoTa = "Dịch vụ kinh tế, áp dụng cho mọi khu vực."
 					},

@@ -22,6 +22,6 @@ namespace Shipping.Repositories.DonHangService
 
 		Task<ReturnState> Cancel(string id, string lyDoHuy);
 
-		Task<ReturnState> UpdatePaymentStatus(string id, bool daThanhToan, string? paymentImage = null,  int? nhanVienId = null, int? shipperId = null);
+		Task<ReturnState> UpdatePaymentStatus(string id, bool daThanhToan, string? paymentImage = null,  int? nhanVienId = null);
 	}
 }

@@ -39,7 +39,7 @@
             <div class="col-lg-4 col-md-6">
                 <div class="card shadow border-0 h-100">
                     <div class="card-header bg-light border-bottom text-center py-3">
-                        <h5 class="m-0 fw-bold text-dark text-uppercase">@item.LoaiVungGia.ToString()</h5>
+                        <h5 class="m-0 fw-bold text-dark text-uppercase">@Html.DisplayFor(Model => item.LoaiVungGia)</h5>
                     </div>
                     <div class="card-body">
                         <form asp-action="EditGiaCuoc" method="post">
@@ -58,6 +58,14 @@
 
                             <div class="mb-3">
                                 <label class="form-label fw-bold small text-muted">Giá tăng thêm (Mỗi bước nhảy)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="fas fa-level-up-alt text-warning"></i></span>
+                                    <input name="GiaTangThem" value="@item.GiaTangThem.ToString("F0")" class="form-control fw-bold" type="number" step="500" min="0" />
+                                    <span class="input-group-text small">₫</span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-muted">Giá vượt (Mỗi bước nhảy)</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-white"><i class="fas fa-level-up-alt text-warning"></i></span>
                                     <input name="GiaVuot" value="@item.GiaVuot.ToString("F0")" class="form-control fw-bold" type="number" step="500" min="0" />
