@@ -132,7 +132,7 @@
                                 <td class="ps-3 fw-bold text-primary">#@item.Id</td>
                                 <td>
                                     <div>@item.TTNguoiGui?.Split('-')[0]</div>
-                                    <small class="text-muted">Gui tu: @item.DiaChiGui</small>
+                                    <small class="text-muted">Gửi từ: @item.TinhThanhGui.TenTinhThanh</small>
                                 </td>
                                 <td><span class="badge bg-light text-dark border">@item.LoaiDichVu?.TenDichVu</span></td>
                                 <td>@item.NgayTao.ToString("dd/MM HH:mm")</td>
@@ -175,7 +175,6 @@
         var myLineChart = new Chart(ctxArea, {
             type: 'line',
             data: {
-                // Lấy dữ liệu từ ViewModel và chuyển thành JSON Array
                 labels: @Html.Raw(Json.Serialize(Model.LabelsNgay)),
                 datasets: [{
                     label: "Số đơn hàng",
@@ -190,7 +189,7 @@
                     pointHoverBorderColor: "rgba(78, 115, 223, 1)",
                     pointHitRadius: 10,
                     pointBorderWidth: 2,
-                    data: @Html.Raw(Json.Serialize(Model.DataDonHang)), // Data số đơn
+                    data: @Html.Raw(Json.Serialize(Model.DataDonHang)), 
                 }],
             },
             options: {
@@ -212,7 +211,7 @@
                 labels: ["Đã Giao", "Đang Giao", "Hủy/Lỗi"],
                 datasets: [{
                     data: [@Model.CountDaGiao, @Model.CountDangGiao, @Model.CountHuy],
-                    backgroundColor: ['#198754', '#0d6efd', '#dc3545'], // Xanh lá, Xanh dương, Đỏ
+                    backgroundColor: ['#198754', '#0d6efd', '#dc3545'],
                     hoverBackgroundColor: ['#157347', '#0b5ed7', '#bb2d3b'],
                     hoverBorderColor: "rgba(234, 236, 244, 1)",
                 }],

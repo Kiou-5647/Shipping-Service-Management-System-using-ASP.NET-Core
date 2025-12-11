@@ -21,14 +21,14 @@ namespace Shipping.Repositories.Dashboard
 
 			var vm = new DashboardViewModel();
 
-			vm.DonHangMoiHomNay = await _context.DonHangs
+			vm.DonHangMoiHomNay = await _context.DonHangs.Include(d => d.TinhThanhGui).Include(d => d.TinhThanhNhan)
 				.CountAsync(d => d.NgayTao >= today);
 
-			vm.DoanhThuHomNay = await _context.DonHangs
+			vm.DoanhThuHomNay = await _context.DonHangs.Include(d => d.TinhThanhGui).Include(d => d.TinhThanhNhan)
 				.Where(d => d.NgayTao >= today && (d.TrangThaiDH == TrangThaiDonHang.DaGiao || d.TrangThaiTT == TrangThaiThanhToan.DaThanhToan))
 				.SumAsync(d => d.ThanhTien);
 
-			vm.DonHangChoXuLy = await _context.DonHangs
+			vm.DonHangChoXuLy = await _context.DonHangs.Include(d => d.TinhThanhGui).Include(d => d.TinhThanhNhan)
 				.CountAsync(d => d.TrangThaiDH == TrangThaiDonHang.ChoXuLy);
 
 			vm.ShipperDangBan = await _context.ChuyenHangs
@@ -37,7 +37,7 @@ namespace Shipping.Repositories.Dashboard
 				.Distinct()
 				.CountAsync();
 
-			var rawData = await _context.DonHangs
+			var rawData = await _context.DonHangs.Include(d => d.TinhThanhGui).Include(d => d.TinhThanhNhan)
 				.Where(d => d.NgayTao >= sevenDaysAgo)
 				.GroupBy(d => d.NgayTao.Date)
 				.Select(g => new { Date = g.Key, Count = g.Count(), Revenue = g.Sum(x => x.ThanhTien) })
@@ -58,6 +58,7 @@ namespace Shipping.Repositories.Dashboard
 			vm.CountHuy = await _context.DonHangs.CountAsync(d => d.TrangThaiDH == TrangThaiDonHang.ThatBai);
 
 			vm.DonHangMoiNhat = await _context.DonHangs
+				.Include(d => d.TinhThanhGui).Include(d => d.TinhThanhNhan)
 				.Include(d => d.LoaiDichVu)
 				.OrderByDescending(d => d.NgayTao)
 				.Take(5)
